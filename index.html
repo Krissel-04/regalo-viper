@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Para ti ❤️</title>
+
+  <style>
+    :root {
+      --rojo: #ff1e2d;
+      --negro: #0a0a0c;
+      --gris: #1a1a1f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    html, body { height: 100%; }
+    body {
+      height: 100dvh;
+      background: var(--negro);
+      color: white;
+      font-family: 'Arial Black', Impact, sans-serif;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      text-align: center;
+      padding: 16px 8px 0;
+      letter-spacing: 3px;
+      color: var(--rojo);
+      text-shadow: 0 0 12px var(--rojo);
+      font-size: 18px;
+    }
+    #escena {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 2px solid var(--rojo);
+    }
+    #panel {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    button {
+      background: var(--gris);
+      color: white;
+      border: 2px solid var(--rojo);
+      border-radius: 12px;
+      padding: 16px 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    /* ===== PANTALLA DE ENTRADA ===== */
+    #intro {
+      position: fixed;
+      inset: 0;
+      background: var(--negro);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transition: opacity 0.8s;
+    }
+    #intro.oculto { opacity: 0; pointer-events: none; }
+    #terminal {
+      font-family: 'Courier New', monospace;
+      color: var(--rojo);
+      font-size: 14px;
+      line-height: 1.9;
+      min-height: 160px;
+      width: 100%;
+      max-width: 320px;
+      text-shadow: 0 0 8px var(--rojo);
+    }
+    #btnEncender {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      font-size: 16px;
+      margin-top: 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s;
+      box-shadow: 0 0 20px var(--rojo);
+      animation: latido 1.2s infinite;
+    }
+    #btnEncender.visible { opacity: 1; pointer-events: auto; }
+    @keyframes latido {
+      50% { box-shadow: 0 0 45px var(--rojo); transform: scale(1.06); }
+    }
+
+    /* ===== AUTO ===== */
+    #escena svg {
+      width: 100%;
+      max-width: 460px;
+      height: auto;
+      filter: drop-shadow(0 0 10px rgba(255, 30, 45, 0.35));
+    }
+    .rin {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    #haz { opacity: 0; transition: opacity 0.4s; }
+    #auto.encendido #haz { opacity: 1; }
+    #auto.encendido #faro { fill: #ffffff; filter: url(#glow); }
+
+    /* ===== VIBRACIÓN DEL MOTOR ===== */
+    @keyframes vibrar {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(0.6px, -0.8px); }
+      50%  { transform: translate(-0.6px, 0.6px); }
+      75%  { transform: translate(0.5px, 0.8px); }
+      100% { transform: translate(0, 0); }
+    }
+    #auto.encendido #cuerpo { animation: vibrar 0.09s infinite; }
+
+    /* ===== NITRO, TACÓMETRO Y CARRETERA ===== */
+    #escena {
+      position: relative;
+      overflow: hidden;
+      flex-direction: column;
+      gap: 4px;
+    }
+    #escena > svg, #tacometro, #carretera { position: relative; z-index: 2; }
+    #tacometro { width: 55%; max-width: 230px; height: auto; }
+    #aguja {
+      transform-origin: 100px 100px;
+      transform: rotate(-90deg);
+    }
+    #llama {
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: right center;
+    }
+    body.nitro #llama { opacity: 1; animation: llama 0.07s infinite alternate; }
+    @keyframes llama {
+      from { transform: scale(0.65, 0.85); }
+      to   { transform: scale(1.1, 1.15); }
+    }
+    body.nitro .rin { animation: girar 0.25s linear infinite; }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    #carretera {
+      width: 100%;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, var(--rojo) 0 40px, transparent 40px 90px);
+      opacity: 0.4;
+      animation: ruta 0.35s linear infinite;
+      animation-play-state: paused;
+    }
+    body.nitro #carretera { animation-play-state: running; opacity: 1; }
+    @keyframes ruta { to { background-position-x: -90px; } }
+
+    #lineas { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+    #lineas span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,0.6) 0 60px, transparent 60px 220px);
+      opacity: 0;
+      animation: ruta 0.3s linear infinite;
+    }
+    body.nitro #lineas span { opacity: 0.5; }
+    #btnNitro { touch-action: none; -webkit-touch-callout: none; }
+
+    /* ===== LUCES ALTAS ===== */
+    #auto.altas #haz {
+      opacity: 1;
+      transition: none;
+      filter: brightness(2) drop-shadow(0 0 10px #fff);
+      transform-box: fill-box;
+      transform-origin: left center;
+      transform: scale(1.1, 1.5);
+    }
+    #auto.altas #faro { fill: #ffffff; filter: url(#glow); }
+
+    /* ===== REGALO SECRETO ===== */
+    #modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    #modal.abierto { opacity: 1; pointer-events: auto; }
+    #tarjeta {
+      width: 100%;
+      max-width: 340px;
+      max-height: 90dvh;
+      overflow-y: auto;
+      background: var(--gris);
+      border: 2px solid var(--rojo);
+      border-radius: 18px;
+      padding: 26px 22px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255, 30, 45, 0.5);
+      transform: scale(0.8);
+      transition: transform 0.5s;
+    }
+    #modal.abierto #tarjeta { transform: scale(1); }
+    #tarjetaTitulo {
+      color: var(--rojo);
+      text-shadow: 0 0 12px var(--rojo);
+      font-size: 20px;
+      line-height: 1.3;
+      margin-bottom: 16px;
+    }
+    #tarjetaTexto {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      white-space: pre-line;
+      margin-bottom: 16px;
+    }
+    #tarjetaFirma {
+      font-family: Arial, sans-serif;
+      color: #bbb;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    #confeti {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- Pantalla de entrada -->
+<div id="intro">
+  <div id="terminal"></div>
+  <button id="btnEncender">🔑 ENCENDER</button>
+</div>
+
+<!-- Tablero -->
+<header>VIPER SRT-10</header>
+
+<div id="escena">
+  <div id="lineas"><span style="top:18%"></span><span style="top:35%; animation-duration:0.22s"></span><span style="top:62%; animation-duration:0.4s"></span><span style="top:80%; animation-duration:0.27s"></span></div>
+
+  <svg id="tacometro" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#2a2a30" stroke-width="6"/>
+    <path d="M 164.7 53 A 80 80 0 0 1 180 100" fill="none" stroke="#ff1e2d" stroke-width="6"/>
+    <g stroke="#888" stroke-width="2">
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(-90 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(-67.5 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(-45 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(-22.5 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(0 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(22.5 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(45 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(67.5 100 100)"/>
+      <line x1="100" y1="26" x2="100" y2="34" transform="rotate(90 100 100)"/>
+    </g>
+    <text x="100" y="82" text-anchor="middle" fill="#888" font-size="9" font-family="Arial">RPM</text>
+    <line id="aguja" x1="100" y1="100" x2="100" y2="30" stroke="#ff1e2d" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="100" cy="100" r="6" fill="#ff1e2d"/>
+  </svg>
+
+  <svg id="auto" viewBox="-70 0 530 156" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="carro" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2b2b33"/>
+        <stop offset="1" stop-color="#0c0c0f"/>
+      </linearGradient>
+      <linearGradient id="luz" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="4" result="b"/>
+        <feMerge>
+          <feMergeNode in="b"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- Sombra en el piso -->
+    <ellipse cx="200" cy="146" rx="180" ry="6" fill="#000" opacity="0.6"/>
+
+    <!-- Haz de luz de los faros -->
+    <polygon id="haz" points="372,98 460,66 460,134" fill="url(#luz)"/>
+
+    <!-- Cuerpo -->
+    <g id="cuerpo">
+      <path d="M 28 118 L 28 90 Q 32 80 60 78 L 115 76 Q 130 58 160 54 L 185 54 Q 205 56 228 76 L 330 87 Q 366 93 375 104 L 377 118 Z"
+            fill="url(#carro)" stroke="#555" stroke-width="1.5"/>
+      <!-- Ventana -->
+      <path d="M 126 75 Q 138 62 160 59 L 183 59 Q 198 61 214 75 Z" fill="#1c2a3a" stroke="#444"/>
+      <!-- Franja roja del cofre y línea lateral -->
+      <path d="M 230 78 L 328 88" stroke="#ff1e2d" stroke-width="2" fill="none"/>
+      <path d="M 40 112 L 370 112" stroke="#ff1e2d" stroke-width="1.5" opacity="0.8"/>
+    </g>
+
+    <!-- Hueco de las llantas -->
+    <circle cx="95" cy="118" r="30" fill="#000"/>
+    <circle cx="305" cy="118" r="30" fill="#000"/>
+
+    <!-- Faros y escape -->
+    <polygon id="faro" points="348,92 372,98 370,104 346,99" fill="#444"/>
+    <rect id="faroTras" x="27" y="92" width="6" height="12" fill="#8a0012"/>
+    <rect id="escape" x="22" y="108" width="12" height="6" rx="2" fill="#999"/>
+    <g id="llama" filter="url(#glow)">
+      <polygon points="22,108 -30,104 -18,109 -62,111 -18,113 -30,118 22,114" fill="#ff5a00"/>
+      <polygon points="22,109.5 -22,108 -34,111 -22,114 22,112.5" fill="#ffd23a"/>
+    </g>
+
+    <!-- Rin trasero -->
+    <g transform="translate(95,118)">
+      <g id="rinTras" class="rin">
+        <circle r="26" fill="#050505" stroke="#222" stroke-width="2"/>
+        <circle r="18" fill="#ff1e2d"/>
+        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3"/>
+        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(60)"/>
+        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(120)"/>
+        <circle r="6" fill="#0a0a0c"/>
+      </g>
+    </g>
+
+    <!-- Rin delantero -->
+    <g transform="translate(305,118)">
+      <g id="rinDel" class="rin">
+        <circle r="26" fill="#050505" stroke="#222" stroke-width="2"/>
+        <circle r="18" fill="#ff1e2d"/>
+        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3"/>
+        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(60)"/>
+        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(120)"/>
+        <circle r="6" fill="#0a0a0c"/>
+      </g>
+    </g>
+  </svg>
+  <div id="carretera"></div>
+</div>
+
+<div id="panel">
+  <button id="btnMotor">🔑 Encender motor</button>
+  <button id="btnNitro">🔥 Nitro</button>
+  <button id="btnClaxon">📯 Claxon</button>
+  <button id="btnRegalo">🎁 Regalo</button>
+</div>
+
+<div id="modal">
+  <div id="tarjeta">
+    <div id="tarjetaTitulo"></div>
+    <div id="tarjetaTexto"></div>
+    <div id="tarjetaFirma"></div>
+    <button id="btnCerrar">Cerrar 🚗</button>
+  </div>
+</div>
+<canvas id="confeti"></canvas>
+
+<script>
+  // ====== TEXTO EDITABLE ======
+  const CONFIG = {
+    nombre: "ALEXIS",
+    lineas: [
+      "> INICIANDO SISTEMA...",
+      "> CARGANDO V10 8.4L...",
+      "> VERIFICANDO RINES... OK",
+      "> USUARIO: ALEXIS ✔",
+      "> LISTO PARA ARRANCAR"
+    ]
+  };
+
+  const terminal = document.getElementById('terminal');
+  const btnEncender = document.getElementById('btnEncender');
+  const intro = document.getElementById('intro');
+
+  const esperar = ms => new Promise(r => setTimeout(r, ms));
+
+  async function escribirSecuencia() {
+    for (const linea of CONFIG.lineas) {
+      const p = document.createElement('div');
+      terminal.appendChild(p);
+      for (const letra of linea) {
+        p.textContent += letra;
+        await esperar(35);
+      }
+      await esperar(350);
+    }
+    btnEncender.classList.add('visible');
+  }
+
+  btnEncender.addEventListener('click', () => {
+    if (navigator.vibrate) navigator.vibrate(200);
+    intro.classList.add('oculto');
+    iniciarAudio();
+  });
+
+  // ====== MOTOR V10 ======
+  const auto = document.getElementById('auto');
+  const btnMotor = document.getElementById('btnMotor');
+  let audioCtx = null;
+  let motor = null;
+  let motorEncendido = false;
+
+  function iniciarAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function arrancarMotor() {
+    iniciarAudio();
+    const ctx = audioCtx;
+    const t = ctx.currentTime;
+
+    const salida = ctx.createGain();
+    salida.gain.setValueAtTime(0, t);
+    salida.gain.linearRampToValueAtTime(0.5, t + 0.3);
+
+    const filtro = ctx.createBiquadFilter();
+    filtro.type = 'lowpass';
+    filtro.frequency.value = 450;
+    filtro.Q.value = 4;
+
+    // Pulsación del motor
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 13;
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 70;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filtro.frequency);
+
+    // Voces del motor (tipo, multiplicador de frecuencia)
+    const voces = [
+      { tipo: 'sawtooth', mult: 1 },
+      { tipo: 'sawtooth', mult: 1.02 },
+      { tipo: 'square',   mult: 0.5 }
+    ];
+    const oscs = voces.map(v => {
+      const o = ctx.createOscillator();
+      o.type = v.tipo;
+      // Arranque: sube rápido y baja al ralentí
+      o.frequency.setValueAtTime(18 * v.mult, t);
+      o.frequency.exponentialRampToValueAtTime(110 * v.mult, t + 0.4);
+      o.frequency.exponentialRampToValueAtTime(55 * v.mult, t + 1.1);
+      o.connect(filtro);
+      o.start(t);
+      return o;
+    });
+
+    filtro.connect(salida);
+    salida.connect(ctx.destination);
+    lfo.start(t);
+
+    motor = { oscs, voces, lfo, salida, filtro, listo: t + 1.2 };
+  }
+
+  function apagarMotor() {
+    if (!motor) return;
+    const ctx = audioCtx;
+    const t = ctx.currentTime;
+    const m = motor;
+    motor = null;
+    m.salida.gain.cancelScheduledValues(t);
+    m.salida.gain.setValueAtTime(m.salida.gain.value, t);
+    m.salida.gain.linearRampToValueAtTime(0, t + 0.4);
+    m.oscs.forEach(o => o.stop(t + 0.45));
+    m.lfo.stop(t + 0.45);
+  }
+
+  btnMotor.addEventListener('click', () => {
+    motorEncendido = !motorEncendido;
+    auto.classList.toggle('encendido', motorEncendido);
+    if (motorEncendido) {
+      arrancarMotor();
+      btnMotor.textContent = '🛑 Apagar motor';
+      if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+    } else {
+      apagarMotor();
+      btnMotor.textContent = '🔑 Encender motor';
+    }
+  });
+
+  // ====== NITRO Y TACÓMETRO ======
+  const btnNitro = document.getElementById('btnNitro');
+  const aguja = document.getElementById('aguja');
+  let nitroActivo = false;
+  let rpm = 0;
+  let ultimoAudio = 0;
+
+  function pulsarNitro(e) {
+    e.preventDefault();
+    if (!motorEncendido) {
+      btnNitro.textContent = '⚠️ Enciende el motor';
+      setTimeout(() => { btnNitro.textContent = '🔥 Nitro'; }, 1200);
+      return;
+    }
+    nitroActivo = true;
+    if (navigator.vibrate) navigator.vibrate(60);
+  }
+  function soltarNitro() { nitroActivo = false; }
+
+  btnNitro.addEventListener('pointerdown', pulsarNitro);
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev =>
+          btnNitro.addEventListener(ev, soltarNitro));
+  btnNitro.addEventListener('contextmenu', e => e.preventDefault());
+
+  function actualizar() {
+    const objetivo = !motorEncendido ? 0 : (nitroActivo ? 0.95 : 0.12);
+    rpm += (objetivo - rpm) * (nitroActivo ? 0.06 : 0.04);
+
+    const temblor = motorEncendido ? Math.sin(Date.now() / 40) * 0.006 : 0;
+    const nivel = Math.max(0, Math.min(1, rpm + temblor));
+    aguja.style.transform = `rotate(${-90 + nivel * 180}deg)`;
+
+    document.body.classList.toggle('nitro', nitroActivo && motorEncendido);
+
+    if (motor && audioCtx.currentTime > motor.listo) {
+      const ahora = audioCtx.currentTime;
+      if (ahora - ultimoAudio > 0.05) {
+        ultimoAudio = ahora;
+        motor.oscs.forEach((o, i) =>
+                o.frequency.setTargetAtTime((30 + rpm * 210) * motor.voces[i].mult, ahora, 0.05));
+        motor.filtro.frequency.setTargetAtTime(450 + rpm * 1800, ahora, 0.05);
+      }
+    }
+    requestAnimationFrame(actualizar);
+  }
+  actualizar();
+
+  // ====== CLAXON Y LUCES ALTAS ======
+  const btnClaxon = document.getElementById('btnClaxon');
+  let claxonOcupado = false;
+
+  function sonarClaxon() {
+    iniciarAudio();
+    const ctx = audioCtx;
+    const t = ctx.currentTime;
+
+    const salida = ctx.createGain();
+    salida.gain.setValueAtTime(0, t);
+    salida.gain.linearRampToValueAtTime(0.35, t + 0.02);
+    salida.gain.setValueAtTime(0.35, t + 0.28);
+    salida.gain.linearRampToValueAtTime(0, t + 0.36);
+
+    const filtro = ctx.createBiquadFilter();
+    filtro.type = 'lowpass';
+    filtro.frequency.value = 1800;
+
+    // Dos tonos, como un claxon real
+    [440, 554].forEach(f => {
+      const o = ctx.createOscillator();
+      o.type = 'square';
+      o.frequency.value = f;
+      o.connect(filtro);
+      o.start(t);
+      o.stop(t + 0.4);
+    });
+
+    filtro.connect(salida);
+    salida.connect(ctx.destination);
+  }
+
+  async function destellar() {
+    for (let i = 0; i < 3; i++) {
+      auto.classList.add('altas');
+      await esperar(110);
+      auto.classList.remove('altas');
+      await esperar(110);
+    }
+  }
+
+  btnClaxon.addEventListener('click', async () => {
+    if (claxonOcupado) return;
+    claxonOcupado = true;
+    sonarClaxon();
+    if (navigator.vibrate) navigator.vibrate(120);
+    await destellar();
+    claxonOcupado = false;
+  });
+
+  // ====== REGALO SECRETO ======
+  // ✏️ AQUÍ EDITAS EL MENSAJE DE LA TARJETA
+  const REGALO = {
+    titulo: "¡FELIZ CUMPLEAÑOS, " + CONFIG.nombre + "! 🎉",
+    texto: "¡Feliz cumpleaños, amor! Como pediste el Viper y soy una estudihambre a distancia, te programé el tuyo propio.\n\nEres de uso rudo como tus trocas 🤠.\n\nTe quiero mucho.\n\nP.D. La programadora aún no es tan pro, jaja 😅",
+    firma: "Con amor, tu programadora favorita 💻❤️"
+  };
+
+  const modal = document.getElementById('modal');
+  const btnRegalo = document.getElementById('btnRegalo');
+  const btnCerrar = document.getElementById('btnCerrar');
+  const lienzo = document.getElementById('confeti');
+  const pincel = lienzo.getContext('2d');
+  let piezas = [];
+  let confetiActivo = false;
+
+  document.getElementById('tarjetaTitulo').textContent = REGALO.titulo;
+  document.getElementById('tarjetaTexto').textContent = REGALO.texto;
+  document.getElementById('tarjetaFirma').textContent = REGALO.firma;
+
+  function ajustarLienzo() {
+    lienzo.width = window.innerWidth;
+    lienzo.height = window.innerHeight;
+  }
+  window.addEventListener('resize', ajustarLienzo);
+  ajustarLienzo();
+
+  function lanzarConfeti() {
+    const colores = ['#ff1e2d', '#ffffff', '#ffd23a', '#ff6b78'];
+    for (let i = 0; i < 160; i++) {
+      piezas.push({
+        x: Math.random() * lienzo.width,
+        y: -20 - Math.random() * lienzo.height * 0.5,
+        w: 6 + Math.random() * 6,
+        h: 10 + Math.random() * 8,
+        vy: 2 + Math.random() * 3.5,
+        vx: -1.5 + Math.random() * 3,
+        giro: Math.random() * 6,
+        vgiro: -0.2 + Math.random() * 0.4,
+        color: colores[Math.floor(Math.random() * colores.length)]
+      });
+    }
+    if (!confetiActivo) {
+      confetiActivo = true;
+      animarConfeti();
+    }
+  }
+
+  function animarConfeti() {
+    pincel.clearRect(0, 0, lienzo.width, lienzo.height);
+    piezas.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.giro += p.vgiro;
+      pincel.save();
+      pincel.translate(p.x, p.y);
+      pincel.rotate(p.giro);
+      pincel.fillStyle = p.color;
+      pincel.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      pincel.restore();
+    });
+    piezas = piezas.filter(p => p.y < lienzo.height + 30);
+    if (piezas.length > 0) {
+      requestAnimationFrame(animarConfeti);
+    } else {
+      confetiActivo = false;
+      pincel.clearRect(0, 0, lienzo.width, lienzo.height);
+    }
+  }
+
+  function sonidoRegalo() {
+    iniciarAudio();
+    const t = audioCtx.currentTime;
+    [523, 659, 784, 1047].forEach((f, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0, t + i * 0.12);
+      g.gain.linearRampToValueAtTime(0.25, t + i * 0.12 + 0.02);
+      g.gain.linearRampToValueAtTime(0, t + i * 0.12 + 0.4);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t + i * 0.12);
+      o.stop(t + i * 0.12 + 0.45);
+    });
+  }
+
+  btnRegalo.addEventListener('click', () => {
+    modal.classList.add('abierto');
+    sonidoRegalo();
+    lanzarConfeti();
+    setTimeout(lanzarConfeti, 1200);
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+  });
+
+  btnCerrar.addEventListener('click', () => {
+    modal.classList.remove('abierto');
+  });
+
+  escribirSecuencia();
+</script>
+</body>
+</html>
