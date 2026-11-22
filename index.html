@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Para ti ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <meta name="theme-color" content="#0a0a0c">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏎️%3C/text%3E%3C/svg%3E">
+
+  <!-- Vista previa del link en WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="🏎️ Alexis, tienes un regalo">
+  <meta property="og:description" content="Enciende el motor y descubre qué te preparé. Hecho a mano, con mucho cariño.">
 
   <style>
     :root {
@@ -127,8 +139,7 @@
       gap: 4px;
     }
     #escena > svg, #tacometro, #carretera { position: relative; z-index: 2; }
-    #tacometro { width: 55%; max-width: 230px; height: auto; }
-    #aguja {
+    #escena #tacometro { width: 55%; max-width: 230px; height: auto; }    #aguja {
       transform-origin: 100px 100px;
       transform: rotate(-90deg);
     }
@@ -236,7 +247,610 @@
       z-index: 30;
       pointer-events: none;
     }
+    /* Luz trasera encendida con el motor */
+    #auto.encendido #faroTras { fill: #ff1e2d; filter: url(#glow); }
 
+    /* ===== PANEL DE CONTROLES TIPO JUEGO ===== */
+    #panel {
+      --t: clamp(54px, 16vw, 66px);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 14px 12px calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+    #panel button {
+      background: none;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      color: #8a8a95;
+      font-family: Arial, sans-serif;
+      font-size: 9px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .aro {
+      width: var(--t);
+      height: var(--t);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 35% 28%, #2e2e36, #101013 70%);
+      border: 2px solid var(--rojo);
+      box-shadow: 0 0 12px rgba(255, 30, 45, 0.35), inset 0 0 10px rgba(0, 0, 0, 0.8);
+      transition: transform 0.12s, box-shadow 0.2s, background 0.2s;
+    }
+    .aro svg {
+      width: 46%;
+      height: 46%;
+      fill: none;
+      stroke: var(--rojo);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 4px rgba(255, 30, 45, 0.8));
+      transition: stroke 0.2s;
+    }
+    #panel button:active .aro {
+      transform: scale(0.92);
+      box-shadow: 0 0 24px rgba(255, 30, 45, 0.85), inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    /* START: se enciende cuando el motor está en marcha */
+    #btnMotor.activo .aro {
+      background: radial-gradient(circle at 50% 35%, #ff4350, #a30010);
+      box-shadow: 0 0 26px var(--rojo), inset 0 0 8px rgba(0, 0, 0, 0.5);
+    }
+    #btnMotor.activo svg { stroke: #fff; filter: drop-shadow(0 0 4px #fff); }
+    #btnMotor.activo { color: var(--rojo); }
+    #btnMotor.pista .aro { animation: pista 0.3s 3; }
+    @keyframes pista { 50% { box-shadow: 0 0 34px #fff; } }
+
+    /* NITRO: pedal más grande */
+    #btnNitro .aro {
+      width: calc(var(--t) * 1.2);
+      height: calc(var(--t) * 1.55);
+      border-radius: 22px 22px 30px 30px;
+      background:
+              repeating-linear-gradient(180deg, transparent 0 9px, rgba(255, 255, 255, 0.05) 9px 11px),
+              radial-gradient(circle at 35% 20%, #34343c, #0f0f12 75%);
+    }
+    #btnNitro svg { width: 52%; height: auto; }
+    #btnNitro.aviso .aro { animation: sacudir 0.35s; }
+    @keyframes sacudir {
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+    body.nitro #btnNitro .aro {
+      transform: translateY(4px) scale(0.95);
+      background: radial-gradient(circle at 50% 30%, #ff9a3a, #c2300a);
+      box-shadow: 0 0 30px #ff5a00, inset 0 0 8px rgba(0, 0, 0, 0.5);
+      border-color: #ffb347;
+    }
+    body.nitro #btnNitro svg { stroke: #fff; filter: drop-shadow(0 0 5px #ffd23a); }
+    body.nitro #btnNitro { color: #ff9a3a; }
+
+    /* REGALO: dorado y latiendo */
+    #btnRegalo .aro {
+      border-color: #ffd23a;
+      box-shadow: 0 0 14px rgba(255, 210, 58, 0.5), inset 0 0 10px rgba(0, 0, 0, 0.8);
+      animation: latidoRegalo 1.6s ease-in-out infinite;
+    }
+    #btnRegalo svg { stroke: #ffd23a; filter: drop-shadow(0 0 4px rgba(255, 210, 58, 0.8)); }
+    #btnRegalo { color: #c9a62e; }
+    @keyframes latidoRegalo {
+      50% { box-shadow: 0 0 28px rgba(255, 210, 58, 0.9), inset 0 0 10px rgba(0, 0, 0, 0.8); transform: scale(1.06); }
+    }
+
+    /* ===== AMBIENTE NOCTURNO ===== */
+    #escena {
+      justify-content: flex-end;
+      padding-bottom: 20px;
+      background:
+              radial-gradient(ellipse at 50% 88%, rgba(255, 30, 45, 0.22), transparent 60%),
+              linear-gradient(180deg, #07070a 0%, #130a1d 50%, #1c0a14 78%, #0a0a0c 100%);
+    }
+
+    /* Cielo: estrellas y luna */
+    #cielo {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+              radial-gradient(circle 14px at 84% 13%, #efe6e8 0 62%, transparent 66%),
+              radial-gradient(circle 44px at 84% 13%, rgba(255, 255, 255, 0.10), transparent),
+              radial-gradient(1.5px 1.5px at 10% 14%, #fff, transparent),
+              radial-gradient(1px 1px at 22% 7%, #fff, transparent),
+              radial-gradient(1.5px 1.5px at 34% 22%, #fff, transparent),
+              radial-gradient(1px 1px at 46% 10%, #fff, transparent),
+              radial-gradient(1px 1px at 58% 5%, #fff, transparent),
+              radial-gradient(1.5px 1.5px at 68% 19%, #fff, transparent),
+              radial-gradient(1px 1px at 76% 6%, #fff, transparent),
+              radial-gradient(1px 1px at 6% 32%, #fff, transparent),
+              radial-gradient(1.5px 1.5px at 92% 30%, #fff, transparent),
+              radial-gradient(1px 1px at 16% 44%, #fff, transparent),
+              radial-gradient(1px 1px at 88% 48%, #fff, transparent);
+      animation: titilar 4s ease-in-out infinite alternate;
+    }
+    @keyframes titilar { from { opacity: 0.55; } to { opacity: 1; } }
+    #cielo::after {
+      content: "";
+      position: absolute;
+      top: 9%;
+      left: -12%;
+      width: 90px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #fff);
+      opacity: 0;
+      animation: estrellaFugaz 9s ease-in 3s infinite;
+    }
+    @keyframes estrellaFugaz {
+      0%   { transform: translate(0, 0) rotate(24deg); opacity: 0; }
+      3%   { opacity: 1; }
+      12%  { transform: translate(480px, 220px) rotate(24deg); opacity: 0; }
+      100% { transform: translate(480px, 220px) rotate(24deg); opacity: 0; }
+    }
+
+    /* Pista: ciudad, piso mojado y reflejo */
+    #pista {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #auto {
+      position: relative;
+      z-index: 2;
+      -webkit-box-reflect: below -7px linear-gradient(transparent 52%, rgba(255, 255, 255, 0.36));
+    }
+    #suelo {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 90px;
+      margin-top: -8px;
+      background: linear-gradient(180deg, #170a10 0%, #0d0a0e 55%, #0a0a0c 100%);
+      border-top: 1px solid rgba(255, 30, 45, 0.28);
+    }
+    #pista #carretera {
+      position: absolute;
+      left: 0;
+      bottom: 20px;
+      z-index: 3;
+    }
+    .ciudad {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 82px;
+      height: 120px;
+      z-index: 0;
+      background-repeat: repeat-x;
+      background-position: 0 100%;
+      animation: avanzarCiudad linear infinite;
+      animation-play-state: paused;
+    }
+    .ciudad.lejos   { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='120' viewBox='0 0 480 120'%3E%3Cg fill='%23271d3d'%3E%3Crect x='0' y='71' width='32' height='49'/%3E%3Crect x='32' y='44' width='23' height='76'/%3E%3Crect x='55' y='37' width='37' height='83'/%3E%3Crect x='92' y='77' width='24' height='43'/%3E%3Crect x='116' y='70' width='33' height='50'/%3E%3Crect x='149' y='56' width='43' height='64'/%3E%3Crect x='192' y='55' width='42' height='65'/%3E%3Crect x='234' y='27' width='37' height='93'/%3E%3Crect x='271' y='57' width='33' height='63'/%3E%3Crect x='304' y='51' width='34' height='69'/%3E%3Crect x='338' y='79' width='28' height='41'/%3E%3Crect x='366' y='72' width='38' height='48'/%3E%3Crect x='404' y='68' width='29' height='52'/%3E%3Crect x='433' y='45' width='47' height='75'/%3E%3C/g%3E%3Cpath d='M213 55v-5' stroke='%23271d3d' stroke-width='1.5'/%3E%3Cpath d='M287 57v-5' stroke='%23271d3d' stroke-width='1.5'/%3E%3Cpath d='M5 77h3v4h-3z M21 77h3v4h-3z M21 86h3v4h-3z M5 95h3v4h-3z M21 95h3v4h-3z M13 104h3v4h-3z M37 50h3v4h-3z M45 50h3v4h-3z M45 59h3v4h-3z M45 86h3v4h-3z M45 95h3v4h-3z M37 104h3v4h-3z M60 52h3v4h-3z M68 52h3v4h-3z M84 52h3v4h-3z M68 70h3v4h-3z M84 70h3v4h-3z M60 88h3v4h-3z M60 106h3v4h-3z M68 106h3v4h-3z M76 106h3v4h-3z M129 76h3v4h-3z M137 76h3v4h-3z M129 94h3v4h-3z M121 103h3v4h-3z M129 103h3v4h-3z M154 62h3v4h-3z M162 62h3v4h-3z M170 62h3v4h-3z M178 62h3v4h-3z M170 71h3v4h-3z M178 71h3v4h-3z M154 98h3v4h-3z M178 107h3v4h-3z M213 61h3v4h-3z M197 70h3v4h-3z M205 79h3v4h-3z M213 79h3v4h-3z M197 97h3v4h-3z M205 106h3v4h-3z M247 33h3v4h-3z M263 42h3v4h-3z M247 51h3v4h-3z M255 60h3v4h-3z M247 78h3v4h-3z M255 78h3v4h-3z M247 87h3v4h-3z M263 96h3v4h-3z M276 63h3v4h-3z M284 63h3v4h-3z M292 63h3v4h-3z M276 90h3v4h-3z M276 108h3v4h-3z M325 57h3v4h-3z M309 66h3v4h-3z M317 66h3v4h-3z M317 75h3v4h-3z M317 93h3v4h-3z M325 93h3v4h-3z M343 85h3v4h-3z M351 85h3v4h-3z M343 94h3v4h-3z M359 94h3v4h-3z M379 78h3v4h-3z M395 78h3v4h-3z M371 87h3v4h-3z M387 87h3v4h-3z M387 105h3v4h-3z M438 51h3v4h-3z M454 60h3v4h-3z M470 60h3v4h-3z M470 69h3v4h-3z M438 78h3v4h-3z M462 78h3v4h-3z M438 87h3v4h-3z M454 87h3v4h-3z M462 96h3v4h-3z' fill='%23b58cf0' fill-opacity='0.5'/%3E%3C/svg%3E"); animation-duration: 16s; }
+    .ciudad.cerca   { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='120' viewBox='0 0 480 120'%3E%3Cg fill='%23100c19'%3E%3Crect x='0' y='42' width='31' height='78'/%3E%3Crect x='31' y='67' width='37' height='53'/%3E%3Crect x='68' y='47' width='32' height='73'/%3E%3Crect x='100' y='46' width='36' height='74'/%3E%3Crect x='136' y='58' width='33' height='62'/%3E%3Crect x='169' y='34' width='30' height='86'/%3E%3Crect x='199' y='56' width='38' height='64'/%3E%3Crect x='237' y='30' width='42' height='90'/%3E%3Crect x='279' y='66' width='28' height='54'/%3E%3Crect x='307' y='58' width='26' height='62'/%3E%3Crect x='333' y='45' width='36' height='75'/%3E%3Crect x='369' y='40' width='45' height='80'/%3E%3Crect x='414' y='57' width='28' height='63'/%3E%3Crect x='442' y='22' width='38' height='98'/%3E%3C/g%3E%3Cpath d='M49 67v-5' stroke='%23100c19' stroke-width='1.5'/%3E%3Crect x='104' y='70' width='28' height='3' fill='%23ff1e2d' opacity='0.9'/%3E%3Crect x='173' y='62' width='22' height='3' fill='%23ff1e2d' opacity='0.9'/%3E%3Crect x='311' y='78' width='18' height='3' fill='%23ff1e2d' opacity='0.9'/%3E%3Crect x='337' y='70' width='28' height='3' fill='%23ff1e2d' opacity='0.9'/%3E%3Crect x='373' y='66' width='37' height='3' fill='%23ff1e2d' opacity='0.9'/%3E%3Crect x='418' y='78' width='20' height='3' fill='%23ff1e2d' opacity='0.9'/%3E%3Cpath d='M21 48h3v4h-3z M13 66h3v4h-3z M21 66h3v4h-3z M21 75h3v4h-3z M13 84h3v4h-3z M21 84h3v4h-3z M5 93h3v4h-3z M21 102h3v4h-3z M21 111h3v4h-3z M36 73h3v4h-3z M52 82h3v4h-3z M60 82h3v4h-3z M44 91h3v4h-3z M60 91h3v4h-3z M52 109h3v4h-3z M81 71h3v4h-3z M89 71h3v4h-3z M73 98h3v4h-3z M81 107h3v4h-3z M89 107h3v4h-3z M113 52h3v4h-3z M121 52h3v4h-3z M105 61h3v4h-3z M121 61h3v4h-3z M129 61h3v4h-3z M121 70h3v4h-3z M105 79h3v4h-3z M121 79h3v4h-3z M129 88h3v4h-3z M105 106h3v4h-3z M157 64h3v4h-3z M141 73h3v4h-3z M157 73h3v4h-3z M141 82h3v4h-3z M149 100h3v4h-3z M174 40h3v4h-3z M174 49h3v4h-3z M182 58h3v4h-3z M182 76h3v4h-3z M190 76h3v4h-3z M182 85h3v4h-3z M182 94h3v4h-3z M190 94h3v4h-3z M212 62h3v4h-3z M220 71h3v4h-3z M204 80h3v4h-3z M220 80h3v4h-3z M204 89h3v4h-3z M228 89h3v4h-3z M228 107h3v4h-3z M250 45h3v4h-3z M266 54h3v4h-3z M242 63h3v4h-3z M250 63h3v4h-3z M258 72h3v4h-3z M242 90h3v4h-3z M250 90h3v4h-3z M266 90h3v4h-3z M242 108h3v4h-3z M292 99h3v4h-3z M312 73h3v4h-3z M312 82h3v4h-3z M320 100h3v4h-3z M338 60h3v4h-3z M354 60h3v4h-3z M338 69h3v4h-3z M346 87h3v4h-3z M338 96h3v4h-3z M354 96h3v4h-3z M354 105h3v4h-3z M374 46h3v4h-3z M382 46h3v4h-3z M398 46h3v4h-3z M398 55h3v4h-3z M390 64h3v4h-3z M398 64h3v4h-3z M382 73h3v4h-3z M382 82h3v4h-3z M398 82h3v4h-3z M390 91h3v4h-3z M398 91h3v4h-3z M427 63h3v4h-3z M419 72h3v4h-3z M427 72h3v4h-3z M435 81h3v4h-3z M419 90h3v4h-3z M427 108h3v4h-3z M463 28h3v4h-3z M455 37h3v4h-3z M463 46h3v4h-3z M447 73h3v4h-3z M463 82h3v4h-3z M463 91h3v4h-3z M455 109h3v4h-3z M471 109h3v4h-3z' fill='%23ffd23a' fill-opacity='0.75'/%3E%3C/svg%3E"); animation-duration: 6s; }
+    .ciudad.postes  { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='120' viewBox='0 0 480 120'%3E%3Cpath d='M110 120V26h14' stroke='%231a1a22' stroke-width='3' fill='none'/%3E%3Ccircle cx='124' cy='27' r='11' fill='%23ffd23a' fill-opacity='0.12'/%3E%3Ccircle cx='124' cy='27' r='5' fill='%23ffd23a' fill-opacity='0.28'/%3E%3Ccircle cx='124' cy='27' r='2.2' fill='%23fff2b0'/%3E%3Cpath d='M350 120V26h14' stroke='%231a1a22' stroke-width='3' fill='none'/%3E%3Ccircle cx='364' cy='27' r='11' fill='%23ffd23a' fill-opacity='0.12'/%3E%3Ccircle cx='364' cy='27' r='5' fill='%23ffd23a' fill-opacity='0.28'/%3E%3Ccircle cx='364' cy='27' r='2.2' fill='%23fff2b0'/%3E%3C/svg%3E"); animation-duration: 2.4s; }
+    body.nitro .ciudad { animation-play-state: running; }
+    @keyframes avanzarCiudad { to { background-position-x: -480px; } }
+
+    /* ===== TABLERO PRO ===== */
+    body { font-family: 'Orbitron', 'Arial Black', Impact, sans-serif; }
+    header { font-size: 17px; font-weight: 900; padding-top: 14px; }
+
+    /* Placa del auto */
+    #placa {
+      display: flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      margin: 7px auto 0;
+      padding: 3px 12px 3px 8px;
+      background: linear-gradient(180deg, #f6f6f8, #c6c6ce);
+      color: #14141a;
+      text-shadow: none;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      border: 2px solid #1a1a1f;
+      border-radius: 5px;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 14px rgba(255, 255, 255, 0.18);
+    }
+    #placa::before {
+      content: "";
+      width: 3px;
+      height: 13px;
+      background: var(--rojo);
+      border-radius: 2px;
+    }
+    #placa b { color: #d4121f; }
+
+    #btnEncender { font-size: 13px; letter-spacing: 1px; }
+    #panel button { font-family: 'Orbitron', Arial, sans-serif; font-size: 8px; letter-spacing: 1px; }
+
+    /* Velocímetro digital, marcha y luces testigo */
+    .digital { font-family: 'Orbitron', 'Arial Black', sans-serif; }
+    #kmh {
+      font-size: 18px;
+      font-weight: 700;
+      fill: #fff;
+      filter: drop-shadow(0 0 4px rgba(255, 30, 45, 0.9));
+    }
+    #marcha { font-size: 10px; font-weight: 700; fill: #ffb000; }
+    .tt { font-size: 5.6px; fill: #7a7a86; letter-spacing: 0.6px; }
+    .led { fill: #24242a; stroke: #3a3a44; stroke-width: 0.6; transition: fill 0.15s; }
+    .led.on.verde  { fill: #2eea7a; filter: drop-shadow(0 0 3px #2eea7a); }
+    .led.on.blanco { fill: #fff2b0; filter: drop-shadow(0 0 3px #ffe680); }
+    .led.on.ambar  { fill: #ffb000; filter: drop-shadow(0 0 3px #ffb000); }
+    .led.on.azul   { fill: #3aa0ff; filter: drop-shadow(0 0 3px #3aa0ff); }
+
+    /* La tarjeta del regalo conserva una fuente más legible para la Ñ */
+    #tarjetaTitulo { font-family: 'Arial Black', Impact, sans-serif; }
+
+    /* ===== EFECTOS DEL NITRO ===== */
+    @keyframes temblor {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(1.2px, -1px); }
+      50%  { transform: translate(-1px, 1.2px); }
+      75%  { transform: translate(1px, 1px); }
+      100% { transform: translate(0, 0); }
+    }
+    body.nitro #pista,
+    body.nitro #tacometro { animation: temblor 0.07s linear infinite; }
+
+    /* Tinte rojo pulsante en los bordes de la pantalla */
+    #escena::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      background: radial-gradient(ellipse at 50% 62%, transparent 42%, rgba(255, 30, 45, 0.38) 100%);
+    }
+    body.nitro #escena::after { opacity: 1; animation: pulsoNitro 0.5s ease-in-out infinite alternate; }
+    @keyframes pulsoNitro { from { opacity: 0.5; } to { opacity: 1; } }
+
+    /* Chispas y humo del escape */
+    #efectos { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+    .chispa {
+      position: absolute;
+      width: 3.5px;
+      height: 3.5px;
+      margin: -1.75px;
+      border-radius: 50%;
+      background: #ffd23a;
+      box-shadow: 0 0 6px 1px #ff7a00;
+    }
+    .humo {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      margin: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(205, 205, 215, 0.55), rgba(120, 120, 130, 0) 70%);
+      filter: blur(2px);
+    }
+
+    /* ===== TARJETA CON MENSAJE QUE SE ESCRIBE SOLO ===== */
+    #tarjetaSistema {
+      font-family: 'Courier New', monospace;
+      color: var(--rojo);
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-align: left;
+      margin-bottom: 14px;
+      text-shadow: 0 0 8px var(--rojo);
+    }
+    #tarjetaTitulo { transition: opacity 0.6s; }
+    #tarjetaFirma { transition: opacity 0.8s; }
+    .cursor::after {
+      content: "▌";
+      display: inline-block;
+      width: 0;
+      overflow: visible;
+      color: var(--rojo);
+      animation: parpadeo 0.7s steps(1) infinite;
+    }
+    @keyframes parpadeo { 50% { opacity: 0; } }
+
+    /* Foto opcional estilo polaroid */
+    #tarjetaFoto {
+      display: none;
+      width: 78%;
+      max-height: 190px;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      padding: 6px 6px 22px;
+      background: #f4f4f6;
+      border-radius: 4px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 14px rgba(255, 30, 45, 0.35);
+      transform: rotate(-2.5deg);
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+    #tarjetaFoto.visible { opacity: 1; }
+
+    /* El botón Cerrar aparece cuando termina de escribirse */
+    #btnCerrar { transition: opacity 0.5s; }
+    #tarjeta.escribiendo #btnCerrar { opacity: 0; pointer-events: none; }
+
+    #tarjetaFirma { white-space: pre-line; }
+    html, body { overscroll-behavior: none; }
+
+    /* ===== AVISO EN HORIZONTAL ===== */
+    #girar {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: var(--negro);
+      color: var(--rojo);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px var(--rojo);
+    }
+    @media (orientation: landscape) and (max-height: 500px) {
+      #girar { display: flex; }
+    }
+    /* ===== EL AUTO ENTRA MANEJANDO ===== */
+    #auto.entrando { animation: entradaAuto 2.2s cubic-bezier(0.25, 0.5, 0.3, 1) 0.6s both; }
+    @keyframes entradaAuto {
+      0%   { transform: translateX(-135%); }
+      72%  { transform: translateX(2.5%); }
+      100% { transform: translateX(0); }
+    }
+    #auto.entrando #cuerpo {
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      animation: cabeceo 2.8s ease-out both;
+    }
+    @keyframes cabeceo {
+      0%, 62% { transform: rotate(0deg); }
+      76%     { transform: rotate(1.8deg); }
+      100%    { transform: rotate(0deg); }
+    }
+    body.llegando .rin { animation: girar 0.18s linear infinite; }
+    body.llegando .ciudad { animation-play-state: running; }
+    body.llegando #carretera { animation-play-state: running; opacity: 1; }
+
+    /* ===== LA DISTANCIA QUE SE ACORTA ===== */
+    #ruta {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(86%, 320px);
+      z-index: 5;
+      text-align: center;
+      pointer-events: none;
+    }
+    #rutaCiudades {
+      display: flex;
+      justify-content: space-between;
+      font-size: 7px;
+      letter-spacing: 1.5px;
+      color: #8a8a95;
+      margin-bottom: 6px;
+    }
+    #rutaBarra {
+      position: relative;
+      height: 4px;
+      border-radius: 3px;
+      background: #2a2a30;
+    }
+    #rutaRelleno {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #ff1e2d, #ff6b78);
+      box-shadow: 0 0 8px var(--rojo);
+    }
+    #rutaCorazon {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translate(-50%, -52%);
+      font-size: 12px;
+      line-height: 1;
+      color: var(--rojo);
+      text-shadow: 0 0 8px var(--rojo);
+    }
+    #rutaTexto {
+      margin-top: 8px;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: #cfcfd6;
+    }
+    #ruta.llegue #rutaTexto { color: #ffd23a; text-shadow: 0 0 10px #ffd23a; }
+
+    /* ===== SECRETOS ESCONDIDOS ===== */
+    header { cursor: pointer; }
+    .sec {
+      position: absolute;
+      z-index: 3;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #sLuna { left: 84%; top: 13%; width: 48px; height: 48px; border-radius: 50%; }
+    #sLuna.hallado {
+      background: radial-gradient(circle, rgba(255, 30, 45, 0.55) 0 30%, transparent 70%);
+      box-shadow: 0 0 22px rgba(255, 30, 45, 0.6);
+    }
+    #sEstrella {
+      left: 17%;
+      top: 24%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffd23a;
+      font-size: 13px;
+      text-shadow: 0 0 8px #ffd23a, 0 0 16px #ff9a00;
+      animation: brilloDorado 2.2s ease-in-out infinite;
+    }
+    @keyframes brilloDorado { 50% { opacity: 0.45; transform: translate(-50%, -50%) scale(0.8); } }
+    #sEstrella.hallado { animation: none; font-size: 18px; }
+    #sNeon {
+      left: 11%;
+      top: 40%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: neonParpadeo 3.4s infinite;
+    }
+    #escena #sNeon svg {
+      width: 22px;
+      height: 22px;
+      max-width: none;
+      fill: none;
+      stroke: #ff5a8a;
+      stroke-width: 1.8;
+      filter: drop-shadow(0 0 4px #ff1e6e) drop-shadow(0 0 9px #ff1e6e);
+    }
+    @keyframes neonParpadeo {
+      0%, 46%, 50%, 54%, 100% { opacity: 1; }
+      48% { opacity: 0.3; }
+      52% { opacity: 0.4; }
+    }
+    #sNeon.hallado { animation: none; }
+
+    #contador {
+      position: absolute;
+      z-index: 5;
+      left: 50%;
+      bottom: 5px;
+      transform: translateX(-50%);
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: #7a7a86;
+      pointer-events: none;
+    }
+    #contador.completo { color: #ffd23a; text-shadow: 0 0 8px #ffd23a; }
+
+    #secreto {
+      position: absolute;
+      z-index: 6;
+      left: 50%;
+      top: 22%;
+      transform: translate(-50%, 8px);
+      width: min(84%, 300px);
+      padding: 12px 14px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #fff;
+      background: rgba(10, 10, 12, 0.86);
+      border: 1px solid rgba(255, 30, 45, 0.65);
+      border-radius: 12px;
+      box-shadow: 0 0 22px rgba(255, 30, 45, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s, transform 0.35s;
+    }
+    #secreto.visible { opacity: 1; transform: translate(-50%, 0); }
+
+    #corazones { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+    .corazon {
+      position: absolute;
+      color: #ff4d5e;
+      text-shadow: 0 0 8px #ff1e2d;
+      line-height: 1;
+    }
+
+    /* Premio al encontrar los cinco secretos */
+    #cielo #corazonCielo {
+      position: absolute;
+      left: 50%;
+      top: 19%;
+      width: 130px;
+      height: 130px;
+      max-width: none;
+      transform: translateX(-50%);
+      fill: none;
+      stroke: #ff3b6b;
+      stroke-width: 0.8;
+      opacity: 0;
+      transition: opacity 1.5s;
+      filter: drop-shadow(0 0 6px #ff1e4d) drop-shadow(0 0 16px #ff1e4d);
+    }
+    #escena.completo #cielo #corazonCielo { opacity: 0.6; animation: latirCielo 1.6s ease-in-out infinite; }
+    @keyframes latirCielo { 50% { transform: translateX(-50%) scale(1.08); } }
+
+    /* La placa gira al tocarla */
+    #placa.gira { animation: giraPlaca 0.55s ease-in-out; }
+    @keyframes giraPlaca {
+      0%, 100% { transform: perspective(300px) rotateX(0deg); }
+      50%      { transform: perspective(300px) rotateX(90deg); }
+    }
+
+    /* ===== DÍAS JUNTOS EN LA TARJETA ===== */
+    #tarjetaDias { opacity: 0; transition: opacity 0.8s; margin: 2px 0 16px; }
+    #tarjetaDias.visible { opacity: 1; }
+    .odo { display: inline-flex; gap: 4px; }
+    .odo b {
+      display: inline-block;
+      width: 26px;
+      height: 36px;
+      line-height: 36px;
+      font-family: 'Orbitron', 'Arial Black', sans-serif;
+      font-size: 20px;
+      color: #fff;
+      background: #0b0b0e;
+      border: 1px solid #3a3a44;
+      border-radius: 5px;
+      text-shadow: 0 0 8px var(--rojo);
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.9);
+    }
+    #tarjetaDias small {
+      display: block;
+      margin-top: 8px;
+      font-family: 'Orbitron', 'Arial Black', sans-serif;
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      color: #8a8a95;
+    }
+
+    /* ===== PANTALLA GRANDE Y MODO LIGERO ===== */
+    html { background: #000; }
+    @media (min-width: 700px) {
+      body { max-width: 480px; margin: 0 auto; box-shadow: 0 0 60px rgba(255, 30, 45, 0.18); }
+    }
+    .ligero #auto { -webkit-box-reflect: unset; }
+    .ligero #escena svg { filter: none; }
+    .ligero body.nitro #pista,
+    .ligero body.nitro #tacometro { animation: none; }
+    .ligero .ciudad.lejos,
+    .ligero .ciudad.postes { display: none; }
   </style>
 </head>
 <body>
@@ -244,16 +858,22 @@
 <!-- Pantalla de entrada -->
 <div id="intro">
   <div id="terminal"></div>
-  <button id="btnEncender">🔑 ENCENDER</button>
+  <button id="btnEncender">ENCENDER</button>
 </div>
 
 <!-- Tablero -->
-<header>VIPER SRT-10</header>
+<header>VIPER SRT-10<div id="placa">ALEXIS<b>27</b></div></header>
 
 <div id="escena">
+  <div id="cielo"></div>
+  <div id="ruta">
+    <div id="rutaCiudades"><span>LOMA BONITA, OAX.</span><span>REYNOSA, TAM.</span></div>
+    <div id="rutaBarra"><i id="rutaRelleno"></i><b id="rutaCorazon">❤</b></div>
+    <div id="rutaTexto"></div>
+  </div>
   <div id="lineas"><span style="top:18%"></span><span style="top:35%; animation-duration:0.22s"></span><span style="top:62%; animation-duration:0.4s"></span><span style="top:80%; animation-duration:0.27s"></span></div>
 
-  <svg id="tacometro" viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg">
+  <svg id="tacometro" viewBox="0 0 200 148" xmlns="http://www.w3.org/2000/svg">
     <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#2a2a30" stroke-width="6"/>
     <path d="M 164.7 53 A 80 80 0 0 1 180 100" fill="none" stroke="#ff1e2d" stroke-width="6"/>
     <g stroke="#888" stroke-width="2">
@@ -270,89 +890,190 @@
     <text x="100" y="82" text-anchor="middle" fill="#888" font-size="9" font-family="Arial">RPM</text>
     <line id="aguja" x1="100" y1="100" x2="100" y2="30" stroke="#ff1e2d" stroke-width="3" stroke-linecap="round"/>
     <circle cx="100" cy="100" r="6" fill="#ff1e2d"/>
+
+    <!-- Marcha y velocidad digital -->
+    <text id="marcha" class="digital" x="100" y="119" text-anchor="middle">N</text>
+    <text id="kmh" class="digital" x="100" y="136" text-anchor="middle">000</text>
+    <text class="digital tt" x="100" y="145" text-anchor="middle">KM/H</text>
+
+    <!-- Luces testigo -->
+    <circle id="ledMotor" class="led verde" cx="12" cy="115" r="3"/>
+    <text class="digital tt" x="19" y="117">MOTOR</text>
+    <circle id="ledLuces" class="led blanco" cx="12" cy="128" r="3"/>
+    <text class="digital tt" x="19" y="130">LUCES</text>
+    <circle id="ledNitro" class="led ambar" cx="188" cy="115" r="3"/>
+    <text class="digital tt" x="181" y="117" text-anchor="end">NITRO</text>
+    <circle id="ledAltas" class="led azul" cx="188" cy="128" r="3"/>
+    <text class="digital tt" x="181" y="130" text-anchor="end">ALTAS</text>
   </svg>
+
+  <div id="pista">
+    <div class="ciudad lejos"></div>
+    <div class="ciudad cerca"></div>
+    <div class="ciudad postes"></div>
 
   <svg id="auto" viewBox="-70 0 530 156" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="carro" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#2b2b33"/>
-        <stop offset="1" stop-color="#0c0c0f"/>
+        <stop offset="0" stop-color="#4a4a56"/>
+        <stop offset="0.28" stop-color="#1c1c22"/>
+        <stop offset="1" stop-color="#050507"/>
+      </linearGradient>
+      <linearGradient id="vidrio" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2c3e50"/>
+        <stop offset="1" stop-color="#07090c"/>
       </linearGradient>
       <linearGradient id="luz" x1="0" y1="0" x2="1" y2="0">
         <stop offset="0" stop-color="#ffffff" stop-opacity="0.75"/>
         <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
       </linearGradient>
+      <linearGradient id="brillo" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+        <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.5"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="brilloV" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.32"/>
+        <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+      <clipPath id="recorte"><path d="M 28 121 C 27 105 27 90 28.5 74 C 29 64 30 58 35 54.5 C 52 55 70 53 91 49.6 C 112 46.5 130 43.5 154 39.8 C 162 38.8 172 38.5 179 39.8 C 190 41.5 200 47 209 52.4 C 216 57 226 63 233.5 67.5 C 245 68 260 69.5 277 71.5 C 295 74 312 77 328 79 C 342 81 358 85 373 91.5 C 379 94.5 382 100 382 107 L 383 117 L 381 131 L 350 133 L 150 133 L 66 128 L 58 122 Z"/></clipPath>
       <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
         <feGaussianBlur stdDeviation="4" result="b"/>
-        <feMerge>
-          <feMergeNode in="b"/>
-          <feMergeNode in="SourceGraphic"/>
-        </feMerge>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
+      <filter id="suave" x="-20%" y="-400%" width="140%" height="900%">
+        <feGaussianBlur stdDeviation="5"/>
+      </filter>
+      <!-- Rin del modelo: aro cromado, barril rojo y rayos negros -->
+      <g id="rinDiseno">
+        <circle r="28.5" fill="#050506"/>
+        <circle r="27" fill="none" stroke="#1c1c21" stroke-width="1"/>
+        <circle r="23" fill="none" stroke="#d6d6de" stroke-width="1.5"/>
+        <circle r="21.8" fill="#ff1e2d"/>
+        <circle r="18.2" fill="#08080a"/>
+        <path d="M-0.58 -5.97 L-1.82 -18.91 M0.58 -5.97 L1.82 -18.91 M3.05 -5.17 L9.64 -16.37 M3.98 -4.49 L12.59 -14.23 M5.50 -2.39 L17.42 -7.58 M5.86 -1.30 L18.55 -4.11 M5.86 1.30 L18.55 4.11 M5.50 2.39 L17.42 7.58 M3.98 4.49 L12.59 14.23 M3.05 5.17 L9.64 16.37 M0.58 5.97 L1.82 18.91 M-0.58 5.97 L-1.82 18.91 M-3.05 5.17 L-9.64 16.37 M-3.98 4.49 L-12.59 14.23 M-5.50 2.39 L-17.42 7.58 M-5.86 1.30 L-18.55 4.11 M-5.86 -1.30 L-18.55 -4.11 M-5.50 -2.39 L-17.42 -7.58 M-3.98 -4.49 L-12.59 -14.23 M-3.05 -5.17 L-9.64 -16.37" stroke="#3c3c46" stroke-width="1.7" fill="none"/>
+        <circle r="6" fill="#111115" stroke="#3c3c46" stroke-width="1"/>
+        <circle r="2" fill="#050506"/>
+      </g>
     </defs>
 
-    <!-- Sombra en el piso -->
-    <ellipse cx="200" cy="146" rx="180" ry="6" fill="#000" opacity="0.6"/>
+    <ellipse cx="203" cy="147" rx="175" ry="4" fill="#ff1e2d" opacity="0.35" filter="url(#suave)"/>
+    <ellipse cx="203" cy="148" rx="192" ry="5" fill="#000" opacity="0.7"/>
 
-    <!-- Haz de luz de los faros -->
-    <polygon id="haz" points="372,98 460,66 460,134" fill="url(#luz)"/>
+    <polygon id="haz" points="377,102 460,66 460,134" fill="url(#luz)"/>
 
-    <!-- Cuerpo -->
-    <g id="cuerpo">
-      <path d="M 28 118 L 28 90 Q 32 80 60 78 L 115 76 Q 130 58 160 54 L 185 54 Q 205 56 228 76 L 330 87 Q 366 93 375 104 L 377 118 Z"
-            fill="url(#carro)" stroke="#555" stroke-width="1.5"/>
-      <!-- Ventana -->
-      <path d="M 126 75 Q 138 62 160 59 L 183 59 Q 198 61 214 75 Z" fill="#1c2a3a" stroke="#444"/>
-      <!-- Franja roja del cofre y línea lateral -->
-      <path d="M 230 78 L 328 88" stroke="#ff1e2d" stroke-width="2" fill="none"/>
-      <path d="M 40 112 L 370 112" stroke="#ff1e2d" stroke-width="1.5" opacity="0.8"/>
-    </g>
-
-    <!-- Hueco de las llantas -->
-    <circle cx="95" cy="118" r="30" fill="#000"/>
-    <circle cx="305" cy="118" r="30" fill="#000"/>
-
-    <!-- Faros y escape -->
-    <polygon id="faro" points="348,92 372,98 370,104 346,99" fill="#444"/>
-    <rect id="faroTras" x="27" y="92" width="6" height="12" fill="#8a0012"/>
-    <rect id="escape" x="22" y="108" width="12" height="6" rx="2" fill="#999"/>
     <g id="llama" filter="url(#glow)">
-      <polygon points="22,108 -30,104 -18,109 -62,111 -18,113 -30,118 22,114" fill="#ff5a00"/>
-      <polygon points="22,109.5 -22,108 -34,111 -22,114 22,112.5" fill="#ffd23a"/>
+      <polygon points="24,114 -30,110 -18,115 -62,118 -18,121 -30,126 24,122" fill="#ff5a00"/>
+      <polygon points="24,115.5 -22,114 -34,118 -22,122 24,120.5" fill="#ffd23a"/>
     </g>
 
-    <!-- Rin trasero -->
-    <g transform="translate(95,118)">
-      <g id="rinTras" class="rin">
-        <circle r="26" fill="#050505" stroke="#222" stroke-width="2"/>
-        <circle r="18" fill="#ff1e2d"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(60)"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(120)"/>
-        <circle r="6" fill="#0a0a0c"/>
+    <g id="cuerpo">
+      <!-- Silueta: cola alta, techo en burbuja, cofre largo que baja a una nariz ancha -->
+      <path d="M 28 121 C 27 105 27 90 28.5 74 C 29 64 30 58 35 54.5 C 52 55 70 53 91 49.6 C 112 46.5 130 43.5 154 39.8 C 162 38.8 172 38.5 179 39.8 C 190 41.5 200 47 209 52.4 C 216 57 226 63 233.5 67.5 C 245 68 260 69.5 277 71.5 C 295 74 312 77 328 79 C 342 81 358 85 373 91.5 C 379 94.5 382 100 382 107 L 383 117 L 381 131 L 350 133 L 150 133 L 66 128 L 58 122 Z"
+            fill="url(#carro)" stroke="#6a6a78" stroke-width="1.2"/>
+
+      <!-- Parachoques trasero -->
+      <path d="M 29 92 L 56 96 L 62 121 L 28 121 Z" fill="#060608"/>
+
+      <!-- Cristal trasero y ventana -->
+      <path d="M 133 45.5 C 120 47.5 105 49.5 91 51.5 C 82 53 76 54 58 56.5 L 58 60 C 75 59 85 57.5 91 56.5 C 105 55 120 53.5 131 52 Z" fill="url(#vidrio)" opacity="0.85"/>
+      <path d="M 212 71 L 190 47 C 186 44.5 180 43.5 172 43.5 C 160 43.5 148 45 138 48 C 134 50 131.5 52 130 56 L 130 63 Z" fill="url(#vidrio)" stroke="#3a3a44" stroke-width="1"/>
+      <path d="M 144 63 C 143 54 145 47 150 47 C 156 47 158 54 157 63 Z" fill="#1b1b21"/>
+      <path d="M 170 44 L 182 44 L 170 66 L 158 66 Z" fill="#fff" opacity="0.06"/>
+
+      <!-- Brillos de volumen -->
+      <path d="M 40 56 C 60 56.5 78 54 96 51.3 C 118 48 138 44.5 156 41.5 C 170 40 180 41 190 43.5 C 198 46 204 50 210 54" stroke="#fff" stroke-opacity="0.5" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <path d="M 34 67 C 60 65 90 64 128 67" stroke="#fff" stroke-opacity="0.3" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M 236 70.5 C 262 71.5 296 76 326 82 C 344 85 358 90 368 96" stroke="#fff" stroke-opacity="0.45" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <path d="M 240 78 C 280 80 320 86 360 102" stroke="#fff" stroke-opacity="0.1" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <rect x="150" y="96" width="70" height="3" rx="1.5" fill="url(#brillo)" opacity="0.5"/>
+      <path d="M 150 70 L 196 70 L 176 112 L 140 112 Z" fill="#fff" opacity="0.05"/>
+
+      <!-- Espejo -->
+      <path d="M 214 66 C 214 61 220 60 224 62 L 226 67 C 222 71 216 71 214 69 Z" fill="#0c0c0f" stroke="#6a6a76" stroke-width="0.8"/>
+
+      <!-- Puerta -->
+      <path d="M 223 75 Q 236 95 241 112 M 130 64 Q 128 90 133 114" stroke="#000" stroke-width="1.3" fill="none" opacity="0.85"/>
+
+      <!-- Entrada de aire detrás de la llanta delantera y logo -->
+      <path d="M 289 87 C 272 90 253 99 243 113 L 247 115 C 262 107 277 105 291 107 Z" fill="#000" stroke="#7a7a86" stroke-width="0.8"/>
+      <text x="259" y="110" font-size="5" font-family="Arial" font-weight="bold" font-style="italic" fill="#d0d0d8" transform="rotate(-6 259 110)">VIPER</text>
+
+      <!-- Ventila del cofre -->
+      <path d="M 240 69.5 C 258 69.5 278 71.5 296 74.5 L 295 77.5 C 278 75 258 73 240 72.8 Z" fill="#000"/>
+
+      <!-- Estribo y escape lateral -->
+      <path d="M 135 120 L 243 118 L 262 132 L 140 133 Z" fill="#000" opacity="0.65"/>
+      <circle cx="142" cy="123" r="4.5" fill="#050507" stroke="#7a7a86" stroke-width="1"/>
+
+      <!-- Volumen del cofre y la salpicadera delantera -->
+      <g clip-path="url(#recorte)">
+        <path d="M 238 70.5 C 295 74 345 81 382 94 L 382 103 C 345 95 295 86 238 74 Z" fill="url(#brilloV)"/>
+        <path d="M 285 93 C 315 95 345 100 376 114" stroke="#fff" stroke-opacity="0.06" stroke-width="6" fill="none" stroke-linecap="round"/>
       </g>
+      <path d="M 244 76 C 280 79 322 85 360 96" stroke="#000" stroke-opacity="0.55" stroke-width="1.2" fill="none"/>
+      <path d="M 244 77.6 C 280 80.6 322 86.6 360 97.6" stroke="#fff" stroke-opacity="0.2" stroke-width="1" fill="none"/>
+      <path d="M 372 93 C 379 96.5 382 101 382.5 108" stroke="#fff" stroke-opacity="0.35" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+
+      <!-- Frente: faro con marco, parrilla con malla y labio -->
+      <path d="M 351 90 L 375 97.5 L 380.5 109 L 355.5 102.5 Z" fill="#0a0a0c" stroke="#8a8a96" stroke-width="0.9"/>
+      <path id="faro" d="M 354 92.5 L 373 98.8 L 377.5 107 L 357.5 101.8 Z" fill="#3a3a42"/>
+      <path d="M 360 104.5 L 380 110.5 L 380 113 L 363 108.5 Z" fill="#7a4300"/>
+      <path d="M 352 114 Q 368 111.5 382 115" stroke="#000" stroke-width="1.2" fill="none"/>
+      <path d="M 352 115.4 Q 368 112.9 382 116.4" stroke="#fff" stroke-opacity="0.25" stroke-width="1" fill="none"/>
+      <path d="M 354 118 Q 368 116 382 119 L 382 128 Q 367 130 354 128 Z" fill="#020203" stroke="#5a5a66" stroke-width="0.8"/>
+      <path d="M 354 122 L 382 122.6 M 354 125.5 L 382 126 M 361 117.5 L 361 129 M 368 117 L 368 129.5 M 375 118 L 375 129" stroke="#23232a" stroke-width="0.9"/>
+      <path d="M 348 129 L 383 128 L 381 133 L 352 134 Z" fill="#111114"/>
+      <path d="M 352 133.4 L 381 132.4" stroke="#ff1e2d" stroke-width="1.3"/>
+
+      <!-- Cola: luz y punta de escape -->
+      <path id="faroTras" d="M 28.5 63 L 33.5 62 L 34 73 L 28.5 74 Z" fill="#7a0010"/>
+      <rect x="21" y="115.5" width="9" height="5" rx="2" fill="#b5b5bd"/>
     </g>
 
-    <!-- Rin delantero -->
-    <g transform="translate(305,118)">
-      <g id="rinDel" class="rin">
-        <circle r="26" fill="#050505" stroke="#222" stroke-width="2"/>
-        <circle r="18" fill="#ff1e2d"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(60)"/>
-        <line x1="-18" y1="0" x2="18" y2="0" stroke="#0a0a0c" stroke-width="3" transform="rotate(120)"/>
-        <circle r="6" fill="#0a0a0c"/>
-      </g>
-    </g>
+    <!-- Arcos de rueda -->
+    <path d="M 63.5 114 A 33.5 33.5 0 0 1 130.5 114 Z" fill="#000"/>
+    <path d="M 293.5 116.5 A 31.5 31.5 0 0 1 356.5 116.5 Z" fill="#000"/>
+    <path d="M 60.5 114 A 36.5 36.5 0 0 1 133.5 114" fill="none" stroke="#6e6e7a" stroke-width="2"/>
+    <path d="M 291.5 116.5 A 33.5 33.5 0 0 1 358.5 116.5" fill="none" stroke="#6e6e7a" stroke-width="2"/>
+
+    <!-- Rines: los traseros son un poco más grandes -->
+    <g transform="translate(97,114) scale(1.1)"><g id="rinTras" class="rin"><use href="#rinDiseno"/></g></g>
+    <g transform="translate(325,116.5) scale(1.03)"><g id="rinDel" class="rin"><use href="#rinDiseno"/></g></g>
   </svg>
   <div id="carretera"></div>
+    <div id="suelo"></div>
+  </div>
 </div>
 
 <div id="panel">
-  <button id="btnMotor">🔑 Encender motor</button>
-  <button id="btnNitro">🔥 Nitro</button>
-  <button id="btnClaxon">📯 Claxon</button>
-  <button id="btnRegalo">🎁 Regalo</button>
+  <button id="btnMotor" aria-label="Encender o apagar motor">
+    <span class="aro">
+      <svg viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/></svg>
+    </span>
+    <span id="lblMotor">START</span>
+  </button>
+
+  <button id="btnClaxon" aria-label="Claxon y luces">
+    <span class="aro">
+      <svg viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+    </span>
+    <span>CLAXON</span>
+  </button>
+
+  <button id="btnRegalo" aria-label="Abrir regalo">
+    <span class="aro">
+      <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg>
+    </span>
+    <span>REGALO</span>
+  </button>
+
+  <button id="btnNitro" aria-label="Nitro">
+    <span class="aro">
+      <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+    </span>
+    <span>NITRO</span>
+  </button>
 </div>
 
 <div id="modal">
@@ -360,11 +1081,11 @@
     <div id="tarjetaTitulo"></div>
     <div id="tarjetaTexto"></div>
     <div id="tarjetaFirma"></div>
-    <button id="btnCerrar">Cerrar 🚗</button>
+    <button id="btnCerrar">Cerrar</button>
   </div>
 </div>
 <canvas id="confeti"></canvas>
-
+<div id="girar"><div style="font-size:34px">📱</div>PON TU TELÉFONO EN VERTICAL</div>
 <script>
   // ====== TEXTO EDITABLE ======
   const CONFIG = {
@@ -482,11 +1203,13 @@
     auto.classList.toggle('encendido', motorEncendido);
     if (motorEncendido) {
       arrancarMotor();
-      btnMotor.textContent = '🛑 Apagar motor';
+      btnMotor.classList.add('activo');
+      document.getElementById('lblMotor').textContent = 'STOP';
       if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
     } else {
       apagarMotor();
-      btnMotor.textContent = '🔑 Encender motor';
+      btnMotor.classList.remove('activo');
+      document.getElementById('lblMotor').textContent = 'START';
     }
   });
 
@@ -500,8 +1223,12 @@
   function pulsarNitro(e) {
     e.preventDefault();
     if (!motorEncendido) {
-      btnNitro.textContent = '⚠️ Enciende el motor';
-      setTimeout(() => { btnNitro.textContent = '🔥 Nitro'; }, 1200);
+      btnNitro.classList.add('aviso');
+      btnMotor.classList.add('pista');
+      setTimeout(() => {
+        btnNitro.classList.remove('aviso');
+        btnMotor.classList.remove('pista');
+      }, 900);
       return;
     }
     nitroActivo = true;
@@ -591,9 +1318,9 @@
   // ====== REGALO SECRETO ======
   // ✏️ AQUÍ EDITAS EL MENSAJE DE LA TARJETA
   const REGALO = {
-    titulo: "¡FELIZ CUMPLEAÑOS, " + CONFIG.nombre + "! 🎉",
-    texto: "¡Feliz cumpleaños, amor! Como pediste el Viper y soy una estudihambre a distancia, te programé el tuyo propio.\n\nEres de uso rudo como tus trocas 🤠.\n\nTe quiero mucho.\n\nP.D. La programadora aún no es tan pro, jaja 😅",
-    firma: "Con amor, tu programadora favorita 💻❤️"
+    titulo: "¡FELICES 27 AÑOTES! 🎉",
+    texto: "¡Feliz cumpleaños, amor! Como pediste el Viper y soy una estudihambre a distancia, te programé el tuyo propio😉\n\nEres de uso rudo como tus trocas, mi norteño favorito😍\n\nTe quiero mucho❣️\n\nP.D. Aún es versión beta, pero está hecho con mucho cariño jaja 😅",
+    firma: "Con amor, tu programadora favorita 💻❤️\n\n...y ya"
   };
 
   const modal = document.getElementById('modal');
@@ -688,6 +1415,710 @@
     modal.classList.remove('abierto');
   });
 
+  // Efecto de presionado en iPhone
+  document.addEventListener('touchstart', () => {}, { passive: true });
+
+  // ====== TABLERO: VELOCÍMETRO, MARCHA Y LUCES TESTIGO ======
+  const kmhTxt = document.getElementById('kmh');
+  const marchaTxt = document.getElementById('marcha');
+  const ledMotor = document.getElementById('ledMotor');
+  const ledLuces = document.getElementById('ledLuces');
+  const ledNitro = document.getElementById('ledNitro');
+  const ledAltas = document.getElementById('ledAltas');
+  let kmh = 0;
+
+  function tablero() {
+    const acelerando = nitroActivo && motorEncendido;
+    const objetivo = acelerando ? 280 : 0;
+    kmh += (objetivo - kmh) * (acelerando ? 0.02 : 0.035);
+    if (kmh < 0.5) kmh = 0;
+    const v = Math.round(kmh);
+    kmhTxt.textContent = String(v).padStart(3, '0');
+
+    // Marcha según la velocidad
+    const cambios = [5, 45, 85, 130, 180, 230];
+    let marcha = 'N';
+    if (v >= cambios[0]) {
+      marcha = 1;
+      for (let i = 1; i < cambios.length; i++) if (v >= cambios[i]) marcha = i + 1;
+    }
+    marchaTxt.textContent = marcha;
+
+    ledMotor.classList.toggle('on', motorEncendido);
+    ledLuces.classList.toggle('on', motorEncendido);
+    ledNitro.classList.toggle('on', acelerando);
+    ledAltas.classList.toggle('on', auto.classList.contains('altas'));
+    requestAnimationFrame(tablero);
+  }
+  tablero();
+
+  // ====== EFECTOS DEL NITRO: CHISPAS, HUMO Y SONIDO ======
+  const pista = document.getElementById('pista');
+  const capaFx = document.createElement('div');
+  capaFx.id = 'efectos';
+  pista.appendChild(capaFx);
+
+  let efectoNitro = false;
+  let timerChispas = null;
+  let ruidoBuf = null;
+  let rugido = null;
+
+  // Posición del escape en pantalla (se adapta al tamaño del auto)
+  function posEscape() {
+    const r = auto.getBoundingClientRect();
+    const p = pista.getBoundingClientRect();
+    return {
+      x: r.left - p.left + ((24 + 70) / 530) * r.width,
+      y: r.top - p.top + (118 / 156) * r.height,
+      k: r.width / 530
+    };
+  }
+
+  function lanzarChispa() {
+    const { x, y, k } = posEscape();
+    const c = document.createElement('i');
+    c.className = 'chispa';
+    c.style.left = x + 'px';
+    c.style.top = (y + (Math.random() - 0.5) * 5 * k) + 'px';
+    capaFx.appendChild(c);
+    const dx = (40 + Math.random() * 110) * k * 2;
+    const sube = (Math.random() - 0.4) * 26;
+    const cae = 20 + Math.random() * 40;
+    c.animate([
+      { transform: 'translate(0, 0)', opacity: 1 },
+      { transform: `translate(${-dx * 0.55}px, ${-sube}px)`, opacity: 1, offset: 0.4 },
+      { transform: `translate(${-dx}px, ${cae}px)`, opacity: 0 }
+    ], { duration: 380 + Math.random() * 420, easing: 'ease-out' }).onfinish = () => c.remove();
+  }
+
+  function lanzarHumo() {
+    const { x, y, k } = posEscape();
+    const h = document.createElement('i');
+    h.className = 'humo';
+    h.style.left = x + 'px';
+    h.style.top = y + 'px';
+    capaFx.appendChild(h);
+    h.animate([
+      { transform: 'translate(0, 0) scale(1)', opacity: 0.6 },
+      { transform: `translate(${-(50 + Math.random() * 70) * k * 2}px, ${-(8 + Math.random() * 22)}px) scale(${3 + Math.random() * 2})`, opacity: 0 }
+    ], { duration: 900 + Math.random() * 600, easing: 'ease-out' }).onfinish = () => h.remove();
+  }
+
+  // ----- Sonidos hechos con ruido blanco -----
+  function bufferRuido() {
+    if (!ruidoBuf) {
+      ruidoBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 1.5, audioCtx.sampleRate);
+      const d = ruidoBuf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    return ruidoBuf;
+  }
+
+  // "Pssh" de la válvula del nitro
+  function psss(volumen, dur, fMin) {
+    const t = audioCtx.currentTime;
+    const src = audioCtx.createBufferSource();
+    src.buffer = bufferRuido();
+    const alto = audioCtx.createBiquadFilter();
+    alto.type = 'highpass';
+    alto.frequency.value = fMin;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(volumen, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(alto);
+    alto.connect(g);
+    g.connect(audioCtx.destination);
+    src.start(t);
+    src.stop(t + dur + 0.05);
+  }
+
+  // Rugido continuo mientras se mantiene el nitro
+  function iniciarRugido() {
+    const t = audioCtx.currentTime;
+    const src = audioCtx.createBufferSource();
+    src.buffer = bufferRuido();
+    src.loop = true;
+    const banda = audioCtx.createBiquadFilter();
+    banda.type = 'bandpass';
+    banda.Q.value = 0.8;
+    banda.frequency.setValueAtTime(700, t);
+    banda.frequency.exponentialRampToValueAtTime(2600, t + 2.5);
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.16, t + 0.25);
+    src.connect(banda);
+    banda.connect(g);
+    g.connect(audioCtx.destination);
+    src.start(t);
+    rugido = { src, g };
+  }
+
+  function detenerRugido() {
+    if (!rugido) return;
+    const t = audioCtx.currentTime;
+    const r = rugido;
+    rugido = null;
+    r.g.gain.cancelScheduledValues(t);
+    r.g.gain.setValueAtTime(r.g.gain.value, t);
+    r.g.gain.linearRampToValueAtTime(0, t + 0.25);
+    r.src.stop(t + 0.3);
+  }
+
+  // Petardeos del escape al soltar el acelerador
+  function petardeo() {
+    [0.06, 0.17, 0.3, 0.38].forEach((retraso, i) => {
+      if (i > 1 && Math.random() < 0.3) return;
+      const t = audioCtx.currentTime + retraso;
+      const src = audioCtx.createBufferSource();
+      src.buffer = bufferRuido();
+      const bajo = audioCtx.createBiquadFilter();
+      bajo.type = 'lowpass';
+      bajo.frequency.value = 900 + Math.random() * 700;
+      const g = audioCtx.createGain();
+      g.gain.setValueAtTime(0.5, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      src.connect(bajo);
+      bajo.connect(g);
+      g.connect(audioCtx.destination);
+      src.start(t, Math.random() * 0.5);
+      src.stop(t + 0.1);
+    });
+  }
+
+  // ----- Conexión con el botón NITRO -----
+  function empezarEfectosNitro() {
+    if (!motorEncendido || efectoNitro) return;
+    efectoNitro = true;
+    iniciarAudio();
+    psss(0.35, 0.35, 2500);
+    iniciarRugido();
+    timerChispas = setInterval(() => {
+      if (!motorEncendido) { terminarEfectosNitro(); return; }
+      lanzarChispa();
+      lanzarChispa();
+      if (Math.random() < 0.5) lanzarChispa();
+      if (Math.random() < 0.35) lanzarHumo();
+    }, 45);
+    if (navigator.vibrate) navigator.vibrate([50, 30, 2500]);
+  }
+
+  function terminarEfectosNitro() {
+    if (!efectoNitro) return;
+    efectoNitro = false;
+    clearInterval(timerChispas);
+    detenerRugido();
+    psss(0.25, 0.5, 1800);
+    petardeo();
+    for (let i = 0; i < 6; i++) setTimeout(lanzarHumo, i * 60);
+    if (navigator.vibrate) navigator.vibrate(0);
+  }
+
+  btnNitro.addEventListener('pointerdown', empezarEfectosNitro);
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev =>
+          btnNitro.addEventListener(ev, terminarEfectosNitro));
+
+  // ====== TARJETA CON MENSAJE QUE SE ESCRIBE SOLO ======
+  // ✏️ OPCIONES DE LA TARJETA
+  const TARJETA = {
+    sistema: "> REGALO DESBLOQUEADO 🔓",
+    foto: "",          // Ejemplo: "foto.jpg". Déjala vacía si no quieres foto.
+    velocidad: 15,     // Milisegundos por letra (más bajo = más rápido)
+    teclas: false       // Sonido de teclado mientras se escribe
+  };
+
+  const tarjeta = document.getElementById('tarjeta');
+  const elTitulo = document.getElementById('tarjetaTitulo');
+  const elTexto = document.getElementById('tarjetaTexto');
+  const elFirma = document.getElementById('tarjetaFirma');
+
+  // Elementos nuevos que se crean desde aquí
+  const elSistema = document.createElement('div');
+  elSistema.id = 'tarjetaSistema';
+  tarjeta.insertBefore(elSistema, elTitulo);
+
+  const elFoto = document.createElement('img');
+  elFoto.id = 'tarjetaFoto';
+  elFoto.alt = 'Nosotros';
+  elFoto.onerror = () => { elFoto.style.display = 'none'; };
+  tarjeta.insertBefore(elFoto, elTexto);
+
+  let corrida = 0;     // Identifica cada vez que se abre la tarjeta
+  let saltar = false;  // Se activa al tocar la tarjeta mientras se escribe
+  const pausa = ms => (saltar ? Promise.resolve() : esperar(ms));
+
+  // Sonido de tecla
+  function tic() {
+    if (!TARJETA.teclas || !audioCtx) return;
+    const t = audioCtx.currentTime;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'square';
+    o.frequency.value = 900 + Math.random() * 500;
+    g.gain.setValueAtTime(0.04, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start(t);
+    o.stop(t + 0.04);
+  }
+
+  // Campanita final
+  function dingFinal() {
+    if (!audioCtx) return;
+    const t = audioCtx.currentTime;
+    [784, 988, 1319].forEach((f, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0, t + i * 0.1);
+      g.gain.linearRampToValueAtTime(0.18, t + i * 0.1 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.1 + 0.6);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t + i * 0.1);
+      o.stop(t + i * 0.1 + 0.65);
+    });
+  }
+
+  // Mantiene a la vista la última línea escrita
+  function seguirTexto(el) {
+    const r = el.getBoundingClientRect();
+    const t = tarjeta.getBoundingClientRect();
+    if (r.bottom > t.bottom - 40) tarjeta.scrollTop += r.bottom - t.bottom + 60;
+  }
+
+  // Deja apartado el espacio que ocupará un texto, sin mostrarlo
+  function reservar(el, texto) {
+    const r = document.createElement('span');
+    r.style.visibility = 'hidden';
+    r.textContent = texto;
+    el.textContent = '';
+    el.append(r);
+  }
+
+  // Escribe letra por letra. El texto que falta queda invisible pero ocupa su lugar,
+  // así la tarjeta no cambia de tamaño mientras se escribe.
+  async function escribir(el, texto, miCorrida) {
+    const letras = Array.from(texto);
+    const escrito = document.createElement('span');
+    const resto = document.createElement('span');
+    resto.style.visibility = 'hidden';
+    el.textContent = '';
+    el.append(escrito, resto);
+    escrito.classList.add('cursor');
+    for (let i = 1; i <= letras.length; i++) {
+      if (miCorrida !== corrida) return false;
+      if (saltar) i = letras.length;
+      escrito.textContent = letras.slice(0, i).join('');
+      resto.textContent = letras.slice(i).join('');
+      if (!saltar) {
+        if (i % 2 === 0 && letras[i - 1].trim()) tic();
+        seguirTexto(escrito);
+        await esperar(TARJETA.velocidad);
+      }
+    }
+    escrito.classList.remove('cursor');
+    return true;
+  }
+
+  async function abrirTarjetaEscrita() {
+    const mia = ++corrida;
+    saltar = false;
+    tarjeta.classList.add('escribiendo');
+    tarjeta.scrollTop = 0;
+    elTitulo.style.opacity = '0';
+    elFirma.style.opacity = '0';
+    reservar(elSistema, TARJETA.sistema);
+    reservar(elTexto, REGALO.texto);
+    elFoto.classList.remove('visible');
+    if (TARJETA.foto) {
+      elFoto.style.display = 'block';
+      elFoto.src = TARJETA.foto;
+    } else {
+      elFoto.style.display = 'none';
+    }
+
+    if (!(await escribir(elSistema, TARJETA.sistema, mia))) return;
+    elTitulo.style.opacity = '1';
+    await pausa(300);
+    if (mia !== corrida) return;
+    elFoto.classList.add('visible');
+    if (TARJETA.foto) await pausa(500);
+    if (mia !== corrida) return;
+
+    if (!(await escribir(elTexto, REGALO.texto, mia))) return;
+    elFirma.style.opacity = '1';
+    dingFinal();
+    lanzarConfeti();
+    tarjeta.classList.remove('escribiendo');
+    tarjeta.scrollTo({ top: tarjeta.scrollHeight, behavior: 'smooth' });
+  }
+
+  btnRegalo.addEventListener('click', abrirTarjetaEscrita);
+  btnCerrar.addEventListener('click', () => { corrida++; });
+  tarjeta.addEventListener('click', () => {
+    if (tarjeta.classList.contains('escribiendo')) saltar = true;
+  });
+
+  // ====== EL AUTO ENTRA MANEJANDO ======
+  function sonidoLlegada() {
+    iniciarAudio();
+    const t = audioCtx.currentTime + 0.5;   // coincide con el retraso de la animación
+
+    // Motor pasando: acelera y luego baja al frenar
+    const filtro = audioCtx.createBiquadFilter();
+    filtro.type = 'lowpass';
+    filtro.frequency.value = 700;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.2, t + 0.5);
+    g.gain.linearRampToValueAtTime(0.13, t + 1.6);
+    g.gain.linearRampToValueAtTime(0, t + 2.1);
+    [1, 1.02, 0.5].forEach((m, i) => {
+      const o = audioCtx.createOscillator();
+      o.type = i === 2 ? 'square' : 'sawtooth';
+      o.frequency.setValueAtTime(150 * m, t);
+      o.frequency.exponentialRampToValueAtTime(230 * m, t + 0.9);
+      o.frequency.exponentialRampToValueAtTime(60 * m, t + 2.0);
+      o.connect(filtro);
+      o.start(t);
+      o.stop(t + 2.2);
+    });
+    filtro.connect(g);
+    g.connect(audioCtx.destination);
+
+    // Chirrido de llantas al frenar
+    const src = audioCtx.createBufferSource();
+    src.buffer = bufferRuido();
+    const banda = audioCtx.createBiquadFilter();
+    banda.type = 'bandpass';
+    banda.Q.value = 6;
+    banda.frequency.setValueAtTime(2400, t + 1.3);
+    banda.frequency.exponentialRampToValueAtTime(1100, t + 1.9);
+    const g2 = audioCtx.createGain();
+    g2.gain.setValueAtTime(0, t + 1.3);
+    g2.gain.linearRampToValueAtTime(0.07, t + 1.4);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 1.95);
+    src.connect(banda);
+    banda.connect(g2);
+    g2.connect(audioCtx.destination);
+    src.start(t + 1.3, Math.random() * 0.5);
+    src.stop(t + 2.0);
+  }
+
+  btnEncender.addEventListener('click', () => {
+    document.body.classList.add('llegando');
+    auto.classList.add('entrando', 'altas');
+    sonidoLlegada();
+  });
+  auto.addEventListener('animationend', e => {
+    if (e.animationName !== 'entradaAuto') return;
+    auto.classList.remove('entrando', 'altas');
+    document.body.classList.remove('llegando');
+  });
+
+  // ====== LA DISTANCIA QUE SE ACORTA ======
+  // ✏️ OPCIONES DEL TRAYECTO
+  const RUTA = {
+    km: 1050,          // Distancia por carretera. Revísala en Google Maps y cámbiala si quieres.
+    velocidad: 0.55,   // Qué tan rápido se acorta (más alto = llegas antes)
+    pausaAntes: 1600   // Milisegundos entre "¡LLEGUÉ!" y la apertura del regalo
+  };
+
+  const rutaEl = document.getElementById('ruta');
+  const rutaRelleno = document.getElementById('rutaRelleno');
+  const rutaCorazon = document.getElementById('rutaCorazon');
+  const rutaTexto = document.getElementById('rutaTexto');
+  let restante = RUTA.km;
+  let llegue = false;
+  let tPrevio = performance.now();
+
+  const formatoKm = n => Math.round(n).toLocaleString('es-MX');
+
+  function pintarRuta() {
+    const avance = 1 - restante / RUTA.km;
+    rutaRelleno.style.width = (avance * 100) + '%';
+    rutaCorazon.style.left = (avance * 100) + '%';
+    if (llegue) rutaTexto.textContent = '¡LLEGUÉ A TI! ❤️';
+    else if (restante === RUTA.km) rutaTexto.textContent = 'ENCIENDE EL MOTOR Y MANTÉN NITRO';
+    else rutaTexto.textContent = `FALTAN ${formatoKm(restante)} KM PARA LLEGAR A TI`;
+  }
+  pintarRuta();
+
+  function llegada() {
+    llegue = true;
+    nitroActivo = false;
+    terminarEfectosNitro();
+    rutaEl.classList.add('llegue');
+    pintarRuta();
+    dingFinal();
+    lanzarConfeti();
+    if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+    setTimeout(() => btnRegalo.click(), RUTA.pausaAntes);
+  }
+
+  function bucleRuta(ahora) {
+    const dt = Math.min((ahora - tPrevio) / 1000, 0.1);
+    tPrevio = ahora;
+    if (!llegue && nitroActivo && motorEncendido && kmh > 0) {
+      restante -= kmh * RUTA.velocidad * dt;
+      if (restante <= 0) {
+        restante = 0;
+        llegada();
+      } else {
+        pintarRuta();
+      }
+    }
+    requestAnimationFrame(bucleRuta);
+  }
+  requestAnimationFrame(bucleRuta);
+
+  // ====== SECRETOS ESCONDIDOS Y DÍAS JUNTOS ======
+  // ✏️ AQUÍ EDITAS LAS FRASES DE LOS SECRETOS
+  const SECRETOS = {
+    luna:     '"Andábamos sin buscarnos pero sabiendo que andábamos para encontrarnos", incluso bajo distinta latitud y la misma luna🌙',
+    estrella: 'Como decía el buen Can: "No es la distancia, es la constancia". Esa luz sigue ahí, incluso en los días nublados.',
+    neon:     'Dos cuerpos en movimiento generan fricción y luz: esta es la energía cinética de coincidir contigo.',
+    placa:    'La probabilidad era casi cero, pero el universo conspiró en un servidor para crear mi mejor coincidencia 🏁',
+    titulo:   'Cada función y cada variable aquí llevan una intención exacta: demostrar que el afecto también se sabe programar.',
+    final:    'Desbloqueaste cada variable de este sistema. La constante más valiosa de mi ecuación eres tú... y ya ❤️'
+  };
+
+
+  // ✏️ FECHA EN QUE EMPEZARON (año-mes-día)
+  const PAREJA = {
+    desde: '2026-09-19',
+    etiqueta: 'DÍAS JUNTOS, AUNQUE SEA A DISTANCIA'
+  };
+
+  const CLAVES = ['luna', 'estrella', 'neon', 'placa', 'titulo'];
+  const hallados = new Set();
+  let turnoToast = 0;
+
+  const escena = document.getElementById('escena');
+  const cielo = document.getElementById('cielo');
+  const placa = document.getElementById('placa');
+
+  // ----- Elementos que se crean desde aquí -----
+  function crearSecreto(id, html) {
+    const el = document.createElement('div');
+    el.id = id;
+    el.className = 'sec';
+    if (html) el.innerHTML = html;
+    escena.appendChild(el);
+    return el;
+  }
+  const sLuna = crearSecreto('sLuna');
+  const sEstrella = crearSecreto('sEstrella', '✦');
+  const iconoCorazon = '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>';
+  const sNeon = crearSecreto('sNeon', `<svg viewBox="0 0 24 24">${iconoCorazon}</svg>`);
+
+  const contador = document.createElement('div');
+  contador.id = 'contador';
+  escena.appendChild(contador);
+
+  const toast = document.createElement('div');
+  toast.id = 'secreto';
+  escena.appendChild(toast);
+
+  const capaCorazones = document.createElement('div');
+  capaCorazones.id = 'corazones';
+  document.body.appendChild(capaCorazones);
+
+  cielo.insertAdjacentHTML('beforeend', `<svg id="corazonCielo" viewBox="0 0 24 24">${iconoCorazon}</svg>`);
+
+  // ----- Contador, sonido y corazones -----
+  function pintarContador() {
+    const total = CLAVES.length;
+    const listo = hallados.size === total;
+    contador.textContent = `SECRETOS ${hallados.size}/${total}` + (listo ? ' ✓' : '');
+    contador.classList.toggle('completo', listo);
+  }
+  pintarContador();
+
+  function sonidoSecreto() {
+    iniciarAudio();
+    const t = audioCtx.currentTime;
+    [880, 1318].forEach((f, i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      g.gain.setValueAtTime(0, t + i * 0.09);
+      g.gain.linearRampToValueAtTime(0.12, t + i * 0.09 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.45);
+      o.connect(g);
+      g.connect(audioCtx.destination);
+      o.start(t + i * 0.09);
+      o.stop(t + i * 0.09 + 0.5);
+    });
+  }
+
+  function soltarCorazones(x, y) {
+    for (let i = 0; i < 9; i++) {
+      const c = document.createElement('i');
+      c.className = 'corazon';
+      c.textContent = '❤';
+      c.style.left = x + 'px';
+      c.style.top = y + 'px';
+      c.style.fontSize = (11 + Math.random() * 10) + 'px';
+      capaCorazones.appendChild(c);
+      const dx = (Math.random() - 0.5) * 90;
+      const dy = -(60 + Math.random() * 90);
+      c.animate([
+        { transform: 'translate(-50%, -50%) scale(0.4)', opacity: 0 },
+        { transform: `translate(calc(-50% + ${dx * 0.4}px), calc(-50% + ${dy * 0.4}px)) scale(1)`, opacity: 1, offset: 0.25 },
+        { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.8)`, opacity: 0 }
+      ], { duration: 1100 + Math.random() * 700, easing: 'ease-out', delay: i * 40, fill: 'both' })
+              .onfinish = () => c.remove();
+    }
+  }
+
+  // ----- Mensaje flotante que se escribe -----
+  async function mostrarMensaje(texto, miTurno) {
+    const letras = Array.from(texto);
+    const escrito = document.createElement('span');
+    const resto = document.createElement('span');
+    resto.style.visibility = 'hidden';
+    resto.textContent = texto;
+    toast.textContent = '';
+    toast.append(escrito, resto);
+    toast.classList.add('visible');
+    for (let i = 1; i <= letras.length; i++) {
+      if (miTurno !== turnoToast) return false;
+      escrito.textContent = letras.slice(0, i).join('');
+      resto.textContent = letras.slice(i).join('');
+      await esperar(22);
+    }
+    return true;
+  }
+
+  async function mostrarFinal(miTurno) {
+    escena.classList.add('completo');
+    dingFinal();
+    lanzarConfeti();
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    if (!(await mostrarMensaje(SECRETOS.final, miTurno))) return;
+    await esperar(4500);
+    if (miTurno === turnoToast) toast.classList.remove('visible');
+  }
+
+  async function secretoHallado(clave, x, y) {
+    const mio = ++turnoToast;
+    const nuevo = !hallados.has(clave);
+    hallados.add(clave);
+    sonidoSecreto();
+    soltarCorazones(x, y);
+    if (navigator.vibrate) navigator.vibrate(40);
+    pintarContador();
+    const completo = hallados.size === CLAVES.length;
+    if (!(await mostrarMensaje(SECRETOS[clave], mio))) return;
+    await esperar(3200);
+    if (mio !== turnoToast) return;
+    if (nuevo && completo) { mostrarFinal(mio); return; }
+    toast.classList.remove('visible');
+  }
+
+  function centroDe(el) {
+    const r = el.getBoundingClientRect();
+    return [r.left + r.width / 2, r.top + r.height / 2];
+  }
+
+  // ----- Dónde se tocan -----
+  sLuna.addEventListener('click', () => {
+    sLuna.classList.add('hallado');
+    secretoHallado('luna', ...centroDe(sLuna));
+  });
+  sEstrella.addEventListener('click', () => {
+    sEstrella.classList.add('hallado');
+    secretoHallado('estrella', ...centroDe(sEstrella));
+  });
+  sNeon.addEventListener('click', () => {
+    sNeon.classList.add('hallado');
+    secretoHallado('neon', ...centroDe(sNeon));
+  });
+
+  // La placa gira y muestra la fecha
+  let placaOcupada = false;
+  function girarPlaca() {
+    if (placaOcupada) return;
+    placaOcupada = true;
+    const original = placa.innerHTML;
+    const [, mes, dia] = PAREJA.desde.split('-');
+    placa.classList.add('gira');
+    setTimeout(() => { placa.innerHTML = `DESDE<b>${dia}·${mes}</b>`; }, 270);
+    setTimeout(() => {
+      placa.classList.remove('gira');
+      void placa.offsetWidth;
+      placa.classList.add('gira');
+      setTimeout(() => { placa.innerHTML = original; }, 270);
+    }, 2800);
+    setTimeout(() => { placa.classList.remove('gira'); placaOcupada = false; }, 3500);
+  }
+  placa.addEventListener('click', e => {
+    e.stopPropagation();
+    girarPlaca();
+    secretoHallado('placa', e.clientX, e.clientY);
+  });
+  document.querySelector('header').addEventListener('click', e => {
+    secretoHallado('titulo', e.clientX, e.clientY);
+  });
+
+  // ----- Días juntos: odómetro en la tarjeta -----
+  const elDias = document.createElement('div');
+  elDias.id = 'tarjetaDias';
+  tarjeta.insertBefore(elDias, elFirma);
+  let corridaDias = 0;
+
+  function diasJuntos() {
+    const [a, m, d] = PAREJA.desde.split('-').map(Number);
+    const inicio = new Date(a, m - 1, d);
+    const hoy = new Date();
+    const hoy0 = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    return Math.max(0, Math.round((hoy0 - inicio) / 86400000));
+  }
+
+  function prepararDias() {
+    const n = diasJuntos();
+    const cifras = Math.max(3, String(n).length);
+    elDias.classList.remove('visible');
+    elDias.innerHTML = `<span class="odo">${'<b>0</b>'.repeat(cifras)}</span><small>${PAREJA.etiqueta}</small>`;
+    elDias.style.display = n > 0 ? '' : 'none';
+  }
+
+  function mostrarDias() {
+    const n = diasJuntos();
+    if (n <= 0) return;
+    const mi = ++corridaDias;
+    elDias.classList.add('visible');
+    const cajas = elDias.querySelectorAll('.odo b');
+    const inicio = performance.now();
+    (function paso(ahora) {
+      if (mi !== corridaDias) return;
+      const p = Math.min(1, (ahora - inicio) / 1500);
+      const valor = Math.round(n * (1 - Math.pow(1 - p, 3)));
+      const txt = String(valor).padStart(cajas.length, '0');
+      cajas.forEach((c, i) => { c.textContent = txt[i]; });
+      if (p < 1) requestAnimationFrame(paso);
+    })(inicio);
+  }
+
+  // Se activa solo: al abrir la tarjeta se reinicia y al terminar de escribirse muestra el odómetro
+  new MutationObserver(() => {
+    if (tarjeta.classList.contains('escribiendo')) {
+      corridaDias++;
+      prepararDias();
+    } else if (modal.classList.contains('abierto')) {
+      mostrarDias();
+    }
+  }).observe(tarjeta, { attributes: true, attributeFilter: ['class'] });
+  prepararDias();
+
+  // ====== MODO LIGERO (celulares muy básicos, o con ?ligero al final del link) ======
+  if ((navigator.deviceMemory && navigator.deviceMemory <= 2) || location.search.includes('ligero')) {
+    document.documentElement.classList.add('ligero');
+  }
   escribirSecuencia();
 </script>
 </body>
