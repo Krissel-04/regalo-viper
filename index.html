@@ -8,15 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 
-  <meta name="theme-color" content="#0a0a0c">
-  <meta name="color-scheme" content="dark">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏎️%3C/text%3E%3C/svg%3E">
-
-  <!-- Vista previa del link en WhatsApp -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="🏎️ Alexis, tienes un regalo">
-  <meta property="og:description" content="Enciende el motor y descubre qué te preparé. Hecho a mano, con mucho cariño.">
-
   <style>
     :root {
       --rojo: #ff1e2d;
@@ -840,18 +831,7 @@
       color: #8a8a95;
     }
 
-    /* ===== PANTALLA GRANDE Y MODO LIGERO ===== */
-    html { background: #000; }
-    @media (min-width: 700px) {
-      body { max-width: 480px; margin: 0 auto; box-shadow: 0 0 60px rgba(255, 30, 45, 0.18); }
-    }
-    .ligero #auto { -webkit-box-reflect: unset; }
-    .ligero #escena svg { filter: none; }
-    .ligero body.nitro #pista,
-    .ligero body.nitro #tacometro { animation: none; }
-    .ligero .ciudad.lejos,
-    .ligero .ciudad.postes { display: none; }
-  </style>
+   </style>
 </head>
 <body>
 
@@ -2115,10 +2095,6 @@
   }).observe(tarjeta, { attributes: true, attributeFilter: ['class'] });
   prepararDias();
 
-  // ====== MODO LIGERO (celulares muy básicos, o con ?ligero al final del link) ======
-  if ((navigator.deviceMemory && navigator.deviceMemory <= 2) || location.search.includes('ligero')) {
-    document.documentElement.classList.add('ligero');
-  }
   escribirSecuencia();
 </script>
 </body>
